@@ -179,7 +179,7 @@
     <div class="form-content">
       <div id="message" class="message"></div>
 
-      <form id="registrationForm">
+      <form id="registrationForm" enctype="multipart/form-data">
         <div class="form-group">
           <label for="institute_name">University/Institute Name *</label>
           <input type="text" id="institute_name" name="institute_name" required>
@@ -190,6 +190,18 @@
           <label for="email">Email Address *</label>
           <input type="email" id="email" name="email" required>
           <small>Official university email</small>
+        </div>
+
+        <div class="form-group">
+          <label for="logo">Institute Logo (PNG/JPG/WebP, max 5MB)</label>
+          <input type="file" id="logo" name="logo" accept="image/png, image/jpeg, image/jpg, image/webp, image/gif">
+          <small>Shown to admin during approval and on certificates</small>
+        </div>
+
+        <div class="form-group">
+          <label for="verification_doc">Verification Document (PDF or image, max 5MB)</label>
+          <input type="file" id="verification_doc" name="verification_doc" accept="application/pdf, image/png, image/jpeg, image/jpg, image/webp">
+          <small>Proof of accreditation/authority. Required for approval.</small>
         </div>
 
         <div class="form-group">
@@ -253,6 +265,8 @@
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value;
       const wallet_address = document.getElementById('wallet_address').value.trim();
+      const logo = document.getElementById('logo').files[0];
+      const verification_doc = document.getElementById('verification_doc').files[0];
 
       // Validation
       if (!institute_name || !email || !password || !wallet_address) {
@@ -270,23 +284,28 @@
         return;
       }
 
+      if (!verification_doc) {
+        showMessage('Verification document is required for approval', 'error');
+        return;
+      }
+
       // Disable submit button
       const btn = form.querySelector('.submit-btn');
       btn.disabled = true;
       btn.textContent = 'Registering...';
 
       try {
+        const formData = new FormData();
+        formData.append('institute_name', institute_name);
+        formData.append('email', email);
+        formData.append('password', password);
+        formData.append('wallet_address', wallet_address);
+        if (logo) formData.append('logo', logo);
+        if (verification_doc) formData.append('verification_doc', verification_doc);
+
         const response = await fetch('/api/university/register', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            institute_name,
-            email,
-            password,
-            wallet_address
-          })
+          body: formData
         });
 
         const data = await response.json();

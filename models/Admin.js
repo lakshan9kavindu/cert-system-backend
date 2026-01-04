@@ -28,7 +28,7 @@ class Admin {
   static async getPendingInstitutes() {
     try {
       const query = `
-        SELECT institute_id, institute_name, email, wallet_address, created_at
+        SELECT institute_id, institute_name, email, wallet_address, logo_url, verification_doc_url, created_at
         FROM institutes 
         WHERE verification_status = 'pending'
         ORDER BY created_at DESC
@@ -44,7 +44,7 @@ class Admin {
   static async getAllInstitutes() {
     try {
       const query = `
-        SELECT institute_id, institute_name, email, wallet_address, verification_status, created_at
+        SELECT institute_id, institute_name, email, wallet_address, logo_url, verification_doc_url, verification_status, created_at
         FROM institutes
         ORDER BY created_at DESC
       `;
@@ -59,7 +59,7 @@ class Admin {
   static async getInstituteById(institute_id) {
     try {
       const query = `
-        SELECT institute_id, institute_name, wallet_address, email, verification_status
+        SELECT institute_id, institute_name, wallet_address, email, verification_status, logo_url, verification_doc_url
         FROM institutes
         WHERE institute_id = ?
       `;

@@ -4,13 +4,13 @@ const { v4: uuidv4 } = require('uuid');
 
 class Institute {
   // Create new institute
-  static async create(name, walletAddress, email, password_hash) {
+  static async create(name, walletAddress, email, password_hash, logoUrl = null, verificationDocUrl = null) {
     try {
       const institute_id = 'INST' + Date.now() + uuidv4().substring(0, 8);
       
       const query = `
-        INSERT INTO institutes (institute_id, institute_name, wallet_address, email, password_hash, verification_status)
-        VALUES (?, ?, ?, ?, ?, ?)
+        INSERT INTO institutes (institute_id, institute_name, wallet_address, email, password_hash, verification_status, logo_url, verification_doc_url)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
       `;
       
       const result = await db.execute(query, [
@@ -19,10 +19,12 @@ class Institute {
         walletAddress,
         email,
         password_hash,
-        'pending'
+        'pending',
+        logoUrl,
+        verificationDocUrl
       ]);
 
-      return { institute_id, name, walletAddress, email };
+      return { institute_id, name, walletAddress, email, logo_url: logoUrl, verification_doc_url: verificationDocUrl };
     } catch (error) {
       throw new Error(`Failed to create institute: ${error.message}`);
     }

@@ -17,6 +17,12 @@ exports.registerInstitute = async (req, res) => {
   try {
     const { institute_name, email, password, wallet_address } = req.body;
 
+    // File uploads
+    const logoFile = req.files && req.files.logo ? req.files.logo[0] : null;
+    const docFile = req.files && req.files.verification_doc ? req.files.verification_doc[0] : null;
+    const logo_url = logoFile ? `/uploads/institutes/${logoFile.filename}` : null;
+    const verification_doc_url = docFile ? `/uploads/institutes/${docFile.filename}` : null;
+
     // Validation
     if (!institute_name || !email || !password || !wallet_address) {
       return res.status(400).json({ error: 'All fields required' });
@@ -36,6 +42,11 @@ exports.registerInstitute = async (req, res) => {
     // Wallet validation (basic check)
     if (!isValidEthAddress(wallet_address)) {
       return res.status(400).json({ error: 'Invalid wallet address format (must be 0x followed by 40 hex characters)' });
+    }
+
+    // Require verification document
+    if (!verification_doc_url) {
+      return res.status(400).json({ error: 'Verification document is required for approval' });
     }
 
     // Check if email exists
@@ -58,7 +69,9 @@ exports.registerInstitute = async (req, res) => {
       institute_name,
       wallet_address,
       email,
-      password_hash
+      password_hash,
+      logo_url,
+      verification_doc_url
     );
 
     // Generate JWT
@@ -78,7 +91,9 @@ exports.registerInstitute = async (req, res) => {
       institute: {
         institute_id: institute.institute_id,
         institute_name: institute.name,
-        email: institute.email
+        email: institute.email,
+        logo_url,
+        verification_doc_url
       }
     });
   } catch (error) {
@@ -156,6 +171,8 @@ exports.getProfile = async (req, res) => {
         email: institute.email,
         wallet_address: institute.wallet_address,
         verification_status: institute.verification_status,
+        logo_url: institute.logo_url || null,
+        verification_doc_url: institute.verification_doc_url || null,
         created_at: institute.created_at
       }
     });

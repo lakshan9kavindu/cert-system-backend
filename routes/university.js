@@ -2,10 +2,18 @@
 const express = require('express');
 const router = express.Router();
 const { verifyToken, verifyUniversity } = require('../middleware/auth');
+const upload = require('../middleware/upload');
 const universityController = require('../controllers/universityController');
 
 // Public routes
-router.post('/register', universityController.registerInstitute);
+router.post(
+	'/register',
+	upload.fields([
+		{ name: 'logo', maxCount: 1 },
+		{ name: 'verification_doc', maxCount: 1 }
+	]),
+	universityController.registerInstitute
+);
 router.post('/login', universityController.loginInstitute);
 
 // Protected routes (require university authentication)

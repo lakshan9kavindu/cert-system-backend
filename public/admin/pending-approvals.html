@@ -330,6 +330,8 @@
                 <th>University Name</th>
                 <th>Email</th>
                 <th>Wallet Address</th>
+                <th>Logo</th>
+                <th>Verification Doc</th>
                 <th>Registered</th>
                 <th>Actions</th>
               </tr>
@@ -340,6 +342,12 @@
                   <td><strong>${inst.institute_name}</strong></td>
                   <td>${inst.email}</td>
                   <td style="font-family: monospace; font-size: 11px;">${inst.wallet_address}</td>
+                  <td>
+                    ${inst.logo_url ? `<img src="${inst.logo_url}" alt="logo" style="max-width:60px; max-height:60px; border:1px solid #eee; border-radius:4px;">` : '<span style="color:#999">No logo</span>'}
+                  </td>
+                  <td>
+                    ${inst.verification_doc_url ? `<a href="${inst.verification_doc_url}" target="_blank">View doc</a>` : '<span style="color:#999">No doc</span>'}
+                  </td>
                   <td>${new Date(inst.created_at).toLocaleDateString()}</td>
                   <td>
                     <div class="action-buttons">
