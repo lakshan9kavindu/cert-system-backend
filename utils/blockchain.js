@@ -141,9 +141,9 @@ class BlockchainService {
         courseName,
         issueDate,
         issuerName,
-        relayerAddress,       // authorizedSigner
-        messageHash,          // bytes32 messageHash
-        signature,            // bytes signature (65 bytes: r + s + v)
+        relayerAddress,
+        messageHash,
+        signature,
         feeOverrides
       );
 
@@ -228,31 +228,24 @@ class BlockchainService {
     try {
       console.log(`🔍 Verifying certificate on blockchain: ${certId}`);
 
-      // Check if certificate exists on blockchain
-      const exists = await this.contract.certificateExists(certId);
-
-      if (!exists) {
-        return {
-          exists: false,
-          verified: false,
-          message: 'Certificate not found on blockchain'
-        };
-      }
-
-      // Get certificate details from contract
-      // Returns: (studentName, courseName, issueDate, issuerName, issuerWallet, isValid)
+      // Contract verifyCertificate returns tuple: (exists, studentName, courseName, issueDate, issuerName, issuer)
       const result = await this.contract.verifyCertificate(certId);
+      // For ABI above, verifyCertificate returns: exists, studentName, courseName, issueDate, issuerName, issuer address
+      const exists = result[0];
+      if (!exists) {
+        return { exists: false, verified: false, message: 'Certificate not found on blockchain' };
+      }
 
       return {
         exists: true,
-        verified: result[5], // isValid boolean
+        verified: true,
         data: {
           certificateId: certId,
-          studentName: result[0],
-          courseName: result[1],
-          issueDate: result[2],
-          issuerName: result[3],
-          issuerWallet: result[4]
+          studentName: result[1],
+          courseName: result[2],
+          issueDate: result[3],
+          issuerName: result[4],
+          issuerWallet: result[5]
         }
       };
     } catch (error) {
@@ -272,20 +265,18 @@ class BlockchainService {
    */
   async getCertificateData(certId) {
     try {
-      const exists = await this.contract.certificateExists(certId);
-      if (!exists) {
-        return null;
-      }
-
       const result = await this.contract.verifyCertificate(certId);
+      const exists = result[0];
+      if (!exists) return null;
       return {
         certificateId: certId,
-        studentName: result[0],
-        courseName: result[1],
-        issueDate: result[2],
-        issuerName: result[3],
-        issuerWallet: result[4],
-        isValid: result[5]
+        studentName: result[1],
+        courseName: result[2],
+        issueDate: result[3],
+        issuerName: result[4],
+        issuerWallet: result[5],
+        isValid: true,
+        exists: true
       };
     } catch (error) {
       console.error('❌ Get certificate error:', error.message);
