@@ -655,7 +655,7 @@
         // Call depositGasFund with amount as value, with explicit gas limit
         const tx = await contract.depositGasFund({
           value: amountWei,
-          gasLimit: ethers.BigNumber.from('150000')
+          gasLimit: ethers.BigNumber.from('200000')
         });
 
         showDepositMessage('Transaction submitted: ' + tx.hash.substring(0, 10) + '...', 'info');
@@ -674,9 +674,11 @@
         console.error('Deposit error:', error);
         // Provide clearer guidance for RPC failures
         const msg = error && error.message ? error.message : 'Unknown error';
+        const code = error && error.code ? `code=${error.code}` : '';
         const dataMsg = error && error.data && error.data.message ? error.data.message : '';
-        const details = dataMsg ? `${msg} | ${dataMsg}` : msg;
-        showDepositMessage('❌ Deposit failed. Check: on Polygon Amoy, have POL balance, try smaller amount. Details: ' + details, 'error');
+        const inner = error && error.error && error.error.message ? error.error.message : '';
+        const details = [code, msg, dataMsg, inner].filter(Boolean).join(' | ');
+        showDepositMessage('❌ Deposit failed. On Polygon Amoy? Balance OK? Try smaller amount. Details: ' + details, 'error');
       } finally {
         btn.disabled = false;
         btn.textContent = '💳 Deposit POL';
