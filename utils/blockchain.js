@@ -579,7 +579,11 @@ class BlockchainService {
    * Add an issuer (admin only; uses current wallet signer)
    */
   async addIssuer(issuerAddress) {
-    const tx = await this.contract.addIssuer(issuerAddress, { gasLimit: 120000 });
+    const tx = await this.contract.addIssuer(issuerAddress, {
+      gasLimit: 120000,
+      maxPriorityFeePerGas: ethers.utils.parseUnits('30', 'gwei'),
+      maxFeePerGas: ethers.utils.parseUnits('60', 'gwei')
+    });
     const receipt = await tx.wait();
     return {
       txHash: receipt.transactionHash,
@@ -592,7 +596,11 @@ class BlockchainService {
    * Remove an issuer (admin only)
    */
   async removeIssuer(issuerAddress) {
-    const tx = await this.contract.removeIssuer(issuerAddress, { gasLimit: 120000 });
+    const tx = await this.contract.removeIssuer(issuerAddress, {
+      gasLimit: 120000,
+      maxPriorityFeePerGas: ethers.utils.parseUnits('30', 'gwei'),
+      maxFeePerGas: ethers.utils.parseUnits('60', 'gwei')
+    });
     const receipt = await tx.wait();
     return {
       txHash: receipt.transactionHash,
