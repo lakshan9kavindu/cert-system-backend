@@ -4,100 +4,44 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bulk Upload - University Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/utility.css">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    body { font-family: 'Inter', sans-serif; display: flex; }
+    .sidebar { width: 240px; background: linear-gradient(180deg, #667eea 0%, #764ba2 100%); color: #fff; display: flex; flex-direction: column; padding: 24px 20px; box-shadow: 4px 0 20px rgba(0,0,0,0.08); position: sticky; top: 0; height: 100vh; }
+    .sidebar h1 { font-size: 20px; margin-bottom: 24px; }
+    .sidebar .nav-link { display: flex; align-items: center; gap: 10px; padding: 10px 12px; margin-bottom: 8px; border-radius: 8px; color: #fff; text-decoration: none; background: rgba(255,255,255,0.06); transition: background 0.2s; font-size: 14px; }
+    .sidebar .nav-link:hover, .sidebar .nav-link.active { background: rgba(255,255,255,0.12); }
+    .sidebar .logout-btn { margin-top: auto; background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.3); color: #fff; padding: 10px 12px; border-radius: 8px; cursor: pointer; font-size: 14px; }
+    .main { flex: 1; padding: 24px 28px; }
+    .upload-area { border: 2px dashed #667eea; border-radius: 8px; padding: 40px; text-align: center; background: #f9f9f9; transition: all 0.2s; }
+    .upload-area:hover { border-color: #764ba2; background: #f5f3ff; }
+    .upload-area.dragover { border-color: #667eea; background: #f0f0ff; }
+    .preview-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    .preview-table th { background: #f5f5f5; padding: 12px; text-align: left; font-weight: 600; border-bottom: 2px solid #ddd; }
+    .preview-table td { padding: 12px; border-bottom: 1px solid #eee; }
+    .preview-table tr:hover { background: #f9f9f9; }
+  </style>
+</head>
+<body class="bg-gray">
+  <div class="sidebar">
+    <h1>🏫 University</h1>
+    <a href="/university/overview.html" class="nav-link">📊 Overview</a>
+    <a href="/university/dashboard.html" class="nav-link">📋 Dashboard</a>
+    <a href="/university/issue-certificate.html" class="nav-link">📜 Issue Certificate</a>
+    <a href="/university/bulk-upload.html" class="nav-link active">📤 Bulk Upload</a>
+    <a href="/university/history.html" class="nav-link">📜 Certificate History</a>
+    <a href="/university/wallet.html" class="nav-link">💰 Wallet</a>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
 
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f5f7fa;
-      min-height: 100vh;
-      display: flex;
-    }
-
-    .sidebar {
-      width: 240px;
-      background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      padding: 24px 20px;
-      box-shadow: 4px 0 20px rgba(0,0,0,0.08);
-      position: sticky;
-      top: 0;
-      height: 100vh;
-    }
-
-    .sidebar h1 {
-      font-size: 20px;
-      margin-bottom: 24px;
-    }
-
-    .sidebar .nav-link {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 12px;
-      margin-bottom: 8px;
-      border-radius: 8px;
-      color: #fff;
-      text-decoration: none;
-      background: rgba(255,255,255,0.06);
-      transition: background 0.2s;
-      font-size: 14px;
-    }
-
-    .sidebar .nav-link:hover,
-    .sidebar .nav-link.active {
-      background: rgba(255,255,255,0.12);
-    }
-
-    .sidebar .logout-btn {
-      margin-top: auto;
-      background: rgba(255,255,255,0.16);
-      border: 1px solid rgba(255,255,255,0.3);
-      color: #fff;
-      padding: 10px 12px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-
-    .main {
-      flex: 1;
-      padding: 24px 28px;
-    }
-
-    .page-header {
-      background: #fff;
-      color: #333;
-      padding: 20px 24px;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-      margin-bottom: 24px;
-    }
-
-    .page-header h1 {
-      font-size: 24px;
-      margin-bottom: 8px;
-    }
-
-    .page-header p {
-      color: #666;
-      font-size: 14px;
-    }
-
-    .container {
-      max-width: 1000px;
-      margin: 0 auto;
-    }
-
-    .section {
-      background: white;
-      padding: 30px;
+  <div class="main">
+    <div class="card mb-6" style="padding: 20px 24px;">
+      <h1 class="text-2xl font-semibold mb-2">📤 Bulk Upload</h1>
+      <p class="text-gray-600 text-sm">Upload multiple certificates at once</p>
+    </div>
       border-radius: 10px;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
       margin-bottom: 30px;
@@ -260,55 +204,52 @@
     }
   </style>
 </head>
-<body>
+<body class="bg-gray">
   <div class="sidebar">
     <h1>🏫 University</h1>
-    <a class="nav-link" href="overview.html">🏠 Overview</a>
-    <a class="nav-link" href="issue-certificate.html">📜 Issue Certificate</a>
-    <a class="nav-link active" href="bulk-upload.html">📤 Bulk Upload</a>
-    <a class="nav-link" href="history.html">📚 History</a>
-    <a class="nav-link" href="wallet.html">💳 Wallet & Balance</a>
+    <a href="/university/overview.html" class="nav-link">📊 Overview</a>
+    <a href="/university/dashboard.html" class="nav-link">📋 Dashboard</a>
+    <a href="/university/issue-certificate.html" class="nav-link">📜 Issue Certificate</a>
+    <a href="/university/bulk-upload.html" class="nav-link active">📤 Bulk Upload</a>
+    <a href="/university/history.html" class="nav-link">📚 Certificate History</a>
+    <a href="/university/wallet.html" class="nav-link">💰 Wallet</a>
     <button class="logout-btn" onclick="logout()">Logout</button>
   </div>
 
   <div class="main">
-    <div class="page-header">
-      <h1>📤 Bulk Upload Certificates</h1>
-      <p>Upload multiple certificates at once using a CSV file</p>
+    <div class="card mb-6" style="padding: 20px 24px;">
+      <h1 class="text-2xl font-semibold mb-2">📤 Bulk Upload Certificates</h1>
+      <p class="text-gray-600 text-sm">Upload multiple certificates at once using a CSV file</p>
     </div>
 
-    <div class="container">
-      <div class="section">
-        <div class="info-box">
-          <h4>CSV Format Requirements</h4>
-          <p>
+    <div style="max-width: 1000px; margin: 0 auto;">
+      <div class="card p-8 mb-6">
+        <div style="background: #e3f2fd; border-left: 4px solid #2196f3; padding: 16px; margin-bottom: 20px; border-radius: 4px;">
+          <h4 class="text-blue-600 font-semibold mb-2">CSV Format Requirements</h4>
+          <p class="text-gray-600 text-sm leading-relaxed">
             Your CSV file must include these columns: <strong>student_id</strong>, <strong>course_name</strong>, <strong>grade</strong><br>
             Example: STU123456, Bachelor of Computer Science, A+<br>
             Maximum 500 certificates per upload.
           </p>
         </div>
 
-        <div id="bulkMessage" class="message"></div>
+        <div id="bulkMessage" style="padding: 12px; border-radius: 5px; margin-bottom: 20px; font-size: 14px; display: none;"></div>
 
-        <div class="csv-upload" id="csvUploadArea">
-          <input type="file" id="csvFile" accept=".csv" onchange="handleCSVSelect(this)">
-          <p style="cursor: pointer; color: #667eea; font-weight: 600; font-size: 18px; margin-bottom: 8px;">
-            📁 Click to upload CSV or drag & drop
-          </p>
+        <div class="upload-area" id="csvUploadArea" style="border: 2px dashed #667eea; border-radius: 8px; padding: 40px; text-align: center; background: #f9f9f9; cursor: pointer;">
+          <input type="file" id="csvFile" accept=".csv" onchange="handleCSVSelect(this)" style="display: none;">
+          <p style="color: #667eea; font-weight: 600; font-size: 18px; margin-bottom: 8px;">📁 Click to upload CSV or drag & drop</p>
           <small style="color: #999;">Max 500 certificates per upload</small>
         </div>
 
         <div id="csvPreview" style="display: none; margin-bottom: 20px;">
-          <h4 style="margin-bottom: 12px;">Preview (first 5 rows)</h4>
-          <table class="certificate-table">
+          <h4 class="font-semibold mb-3">Preview (first 5 rows)</h4>
+          <table class="preview-table">
             <thead id="previewHead"></thead>
             <tbody id="previewBody"></tbody>
           </table>
         </div>
 
-        <button class="submit-btn" id="uploadBtn" style="display: none;" onclick="submitBulkUpload()">
-          Upload Certificates
-        </button>
+        <button class="btn btn-primary" id="uploadBtn" style="display: none;" onclick="submitBulkUpload()">Upload Certificates</button>
       </div>
     </div>
   </div>

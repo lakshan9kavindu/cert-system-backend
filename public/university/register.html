@@ -4,198 +4,46 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>University Registration - Certificate Verification System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/utility.css">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-    }
-
-    .container {
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-      overflow: hidden;
-      max-width: 500px;
-      width: 100%;
-    }
-
-    .header {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 40px 20px;
-      text-align: center;
-    }
-
-    .header h1 {
-      font-size: 28px;
-      margin-bottom: 10px;
-    }
-
-    .header p {
-      font-size: 14px;
-      opacity: 0.9;
-    }
-
-    .form-content {
-      padding: 40px;
-    }
-
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 600;
-      color: #333;
-      font-size: 14px;
-    }
-
-    input[type="text"],
-    input[type="email"],
-    input[type="password"],
-    select {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      font-size: 14px;
-      transition: border-color 0.3s;
-    }
-
-    input[type="text"]:focus,
-    input[type="email"]:focus,
-    input[type="password"]:focus,
-    select:focus {
-      outline: none;
-      border-color: #667eea;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    }
-
-    .form-group small {
-      display: block;
-      margin-top: 5px;
-      color: #666;
-      font-size: 12px;
-    }
-
-    .submit-btn {
-      width: 100%;
-      padding: 12px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      border: none;
-      border-radius: 5px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .submit-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
-    }
-
-    .submit-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .login-link {
-      text-align: center;
-      margin-top: 20px;
-      padding-top: 20px;
-      border-top: 1px solid #eee;
-      color: #666;
-      font-size: 14px;
-    }
-
-    .login-link a {
-      color: #667eea;
-      text-decoration: none;
-      font-weight: 600;
-    }
-
-    .login-link a:hover {
-      text-decoration: underline;
-    }
-
-    .message {
-      padding: 12px;
-      border-radius: 5px;
-      margin-bottom: 20px;
-      font-size: 14px;
-      display: none;
-    }
-
-    .message.error {
-      background-color: #fee;
-      color: #c00;
-      display: block;
-    }
-
-    .message.success {
-      background-color: #efe;
-      color: #060;
-      display: block;
-    }
-
-    .loading {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    .wallet-info {
-      background-color: #f0f4ff;
-      padding: 12px;
-      border-radius: 5px;
-      font-size: 12px;
-      color: #667eea;
-      margin-top: 10px;
-    }
+    body { font-family: 'Inter', sans-serif; }
+    .message { padding: 12px; border-radius: 5px; margin-bottom: 20px; font-size: 14px; display: none; }
+    .message.error { background-color: #fee; color: #c00; display: block; }
+    .message.success { background-color: #efe; color: #060; display: block; }
+    .loading { opacity: 0.6; cursor: not-allowed; }
+    .wallet-info { background-color: #f0f4ff; padding: 12px; border-radius: 5px; font-size: 12px; color: #667eea; margin-top: 10px; }
   </style>
 </head>
-<body>
-  <div class="container">
-    <div class="header">
-      <h1>🏫 University Registration</h1>
-      <p>Join our certificate verification network</p>
+<body class="hero flex items-center justify-center" style="min-height: 100vh; padding: 20px;">
+  <div class="card" style="max-width: 500px; width: 100%; overflow: hidden; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);">
+    <div class="hero text-center" style="padding: 40px 20px;">
+      <h1 class="text-3xl font-bold text-white mb-2">🏫 University Registration</h1>
+      <p class="text-sm text-white" style="opacity: 0.9;">Join our certificate verification network</p>
     </div>
 
-    <div class="form-content">
+    <div style="padding: 40px;">
       <div id="message" class="message"></div>
 
       <form id="registrationForm" enctype="multipart/form-data">
-        <div class="form-group">
-          <label for="institute_name">University/Institute Name *</label>
-          <input type="text" id="institute_name" name="institute_name" required>
-          <small>Your official institution name</small>
+        <div class="mb-5">
+          <label for="institute_name" class="block mb-2 font-semibold text-sm">University/Institute Name *</label>
+          <input type="text" id="institute_name" name="institute_name" class="input" required>
+          <small class="block mt-1 text-gray-600 text-xs">Your official institution name</small>
         </div>
 
-        <div class="form-group">
-          <label for="email">Email Address *</label>
-          <input type="email" id="email" name="email" required>
-          <small>Official university email</small>
+        <div class="mb-5">
+          <label for="email" class="block mb-2 font-semibold text-sm">Email Address *</label>
+          <input type="email" id="email" name="email" class="input" required>
+          <small class="block mt-1 text-gray-600 text-xs">Official university email</small>
         </div>
 
-        <div class="form-group">
-          <label for="logo">Institute Logo (PNG/JPG/WebP, max 5MB)</label>
-          <input type="file" id="logo" name="logo" accept="image/png, image/jpeg, image/jpg, image/webp, image/gif">
-          <small>Shown to admin during approval and on certificates</small>
+        <div class="mb-5">
+          <label for="logo" class="block mb-2 font-semibold text-sm">Institute Logo (PNG/JPG/WebP, max 5MB)</label>
+          <input type="file" id="logo" name="logo" accept="image/png, image/jpeg, image/jpg, image/webp, image/gif" class="input">
+          <small class="block mt-1 text-gray-600 text-xs">Shown to admin during approval and on certificates</small>
         </div>
 
         <div class="form-group">
