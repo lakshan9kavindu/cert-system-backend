@@ -1,3 +1,8 @@
+/* Tailwind CSS Integration */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* Modern Utility-First CSS Framework for Cert System */
 
 /* CSS Reset & Base */
