@@ -4,152 +4,27 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Manage Universities - Admin Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/css/utility.css">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f5f7fa;
-      min-height: 100vh;
-      display: flex;
-    }
-
-    .sidebar {
-      width: 240px;
-      background: linear-gradient(180deg, #b71c1c 0%, #8a0f0f 100%);
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      padding: 24px 20px;
-      box-shadow: 4px 0 20px rgba(0,0,0,0.08);
-      position: sticky;
-      top: 0;
-      height: 100vh;
-    }
-
-    .sidebar h1 {
-      font-size: 20px;
-      margin-bottom: 24px;
-    }
-
-    .sidebar .nav-link {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 12px;
-      margin-bottom: 8px;
-      border-radius: 8px;
-      color: #fff;
-      text-decoration: none;
-      background: rgba(255,255,255,0.06);
-      transition: background 0.2s;
-      font-size: 14px;
-    }
-
-    .sidebar .nav-link:hover,
-    .sidebar .nav-link.active {
-      background: rgba(255,255,255,0.12);
-    }
-
-    .sidebar .logout-btn {
-      margin-top: auto;
-      background: rgba(255,255,255,0.16);
-      border: 1px solid rgba(255,255,255,0.3);
-      color: #fff;
-      padding: 10px 12px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-
-    .main {
-      flex: 1;
-      padding: 24px 28px;
-    }
-
-    .page-header {
-      background: #fff;
-      color: #333;
-      padding: 20px 24px;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-      margin-bottom: 24px;
-    }
-
-    .page-header h1 {
-      font-size: 24px;
-      margin-bottom: 8px;
-    }
-
-    .page-header p {
-      color: #666;
-      font-size: 14px;
-    }
-
-    .container {
-      max-width: 1400px;
-      margin: 0 auto;
-    }
-
-    .section {
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-      margin-bottom: 30px;
-    }
-
-    .institute-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    .institute-table th {
-      background: #f5f5f5;
-      padding: 15px;
-      text-align: left;
-      font-weight: 600;
-      color: #333;
-      border-bottom: 2px solid #ddd;
-      font-size: 13px;
-    }
-
-    .institute-table td {
-      padding: 15px;
-      border-bottom: 1px solid #eee;
-      font-size: 14px;
-    }
-
-    .institute-table tr:hover {
-      background: #f9f9f9;
-    }
-
-    .status-badge {
-      display: inline-block;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-    }
-
-    .status-badge.pending {
-      background: #fff3cd;
-      color: #856404;
-    }
-
-    .status-badge.approved {
-      background: #d4edda;
-      color: #155724;
-    }
-
-    .status-badge.rejected {
-      background: #f8d7da;
-      color: #721c24;
-    }
+    body { font-family: 'Inter', sans-serif; display: flex; }
+    .sidebar { width: 240px; background: linear-gradient(180deg, #b71c1c 0%, #8a0f0f 100%); color: #fff; display: flex; flex-direction: column; padding: 24px 20px; box-shadow: 4px 0 20px rgba(0,0,0,0.08); position: sticky; top: 0; height: 100vh; }
+    .sidebar h1 { font-size: 20px; margin-bottom: 24px; }
+    .sidebar .nav-link { display: flex; align-items: center; gap: 10px; padding: 10px 12px; margin-bottom: 8px; border-radius: 8px; color: #fff; text-decoration: none; background: rgba(255,255,255,0.06); transition: background 0.2s; font-size: 14px; }
+    .sidebar .nav-link:hover, .sidebar .nav-link.active { background: rgba(255,255,255,0.12); }
+    .sidebar .logout-btn { margin-top: auto; background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.3); color: #fff; padding: 10px 12px; border-radius: 8px; cursor: pointer; font-size: 14px; }
+    .main { flex: 1; padding: 24px 28px; }
+    .institute-table { width: 100%; border-collapse: collapse; }
+    .institute-table th { background: #f5f5f5; padding: 15px; text-align: left; font-weight: 600; color: #333; border-bottom: 2px solid #ddd; font-size: 13px; }
+    .institute-table td { padding: 15px; border-bottom: 1px solid #eee; font-size: 14px; }
+    .institute-table tr:hover { background: #f9f9f9; }
+    .status-badge { display: inline-block; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+    .status-badge.pending { background: #fff3cd; color: #856404; }
+    .status-badge.approved { background: #d4edda; color: #155724; }
+    .status-badge.rejected { background: #f8d7da; color: #721c24; }
 
     .btn-approve,
     .btn-reject {
@@ -255,23 +130,23 @@
     }
   </style>
 </head>
-<body>
+<body class="bg-gray">
   <div class="sidebar">
     <h1>🔐 Admin</h1>
-    <a class="nav-link" href="dashboard.html">🏠 Dashboard</a>
-    <a class="nav-link" href="pending-approvals.html">⏳ Pending</a>
-    <a class="nav-link active" href="manage-universities.html">🏫 Universities</a>
+    <a href="/admin/dashboard.html" class="nav-link">📋 Dashboard</a>
+    <a href="/admin/pending-approvals.html" class="nav-link">⌛ Pending Approvals</a>
+    <a href="/admin/manage-universities.html" class="nav-link active">🏫 Manage Universities</a>
     <button class="logout-btn" onclick="logout()">Logout</button>
   </div>
 
   <div class="main">
-    <div class="page-header">
-      <h1>🏫 Manage Universities</h1>
-      <p>View all registered universities and manage their issuer status</p>
+    <div class="card mb-6" style="padding: 20px 24px;">
+      <h1 class="text-2xl font-semibold mb-2">Manage Universities</h1>
+      <p class="text-gray-600 text-sm">View and manage all registered institutions</p>
     </div>
 
-    <div class="container">
-      <div class="section">
+    <div style="max-width: 1400px; margin: 0 auto;">
+      <div class="card p-8 mb-6">
         <div id="allMessage" class="message"></div>
         <div id="instituteList"></div>
       </div>

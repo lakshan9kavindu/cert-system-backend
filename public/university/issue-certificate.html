@@ -4,148 +4,73 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Issue Certificate - University Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/css/utility.css">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f5f7fa;
-      min-height: 100vh;
-      display: flex;
-    }
-
-    .sidebar {
-      width: 240px;
-      background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      padding: 24px 20px;
-      box-shadow: 4px 0 20px rgba(0,0,0,0.08);
-      position: sticky;
-      top: 0;
-      height: 100vh;
-    }
-
-    .sidebar h1 {
-      font-size: 20px;
+    body { font-family: 'Inter', sans-serif; display: flex; }
+    .sidebar { width: 240px; background: linear-gradient(180deg, #667eea 0%, #764ba2 100%); color: #fff; display: flex; flex-direction: column; padding: 24px 20px; box-shadow: 4px 0 20px rgba(0,0,0,0.08); position: sticky; top: 0; height: 100vh; }
+    .sidebar h1 { font-size: 20px; margin-bottom: 24px; }
+    .sidebar .nav-link { display: flex; align-items: center; gap: 10px; padding: 10px 12px; margin-bottom: 8px; border-radius: 8px; color: #fff; text-decoration: none; background: rgba(255,255,255,0.06); transition: background 0.2s; font-size: 14px; }
+    .sidebar .nav-link:hover, .sidebar .nav-link.active { background: rgba(255,255,255,0.12); }
+    .sidebar .logout-btn { margin-top: auto; background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.3); color: #fff; padding: 10px 12px; border-radius: 8px; cursor: pointer; font-size: 14px; }
+    .main { flex: 1; padding: 24px 28px; }
+    
+    .form-group {
       margin-bottom: 24px;
     }
 
-    .sidebar .nav-link {
+    .form-group label {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 10px 12px;
-      margin-bottom: 8px;
-      border-radius: 8px;
-      color: #fff;
-      text-decoration: none;
-      background: rgba(255,255,255,0.06);
-      transition: background 0.2s;
-      font-size: 14px;
-    }
-
-    .sidebar .nav-link:hover,
-    .sidebar .nav-link.active {
-      background: rgba(255,255,255,0.12);
-    }
-
-    .sidebar .logout-btn {
-      margin-top: auto;
-      background: rgba(255,255,255,0.16);
-      border: 1px solid rgba(255,255,255,0.3);
-      color: #fff;
-      padding: 10px 12px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-
-    .main {
-      flex: 1;
-      padding: 24px 28px;
-    }
-
-    .page-header {
-      background: #fff;
-      color: #333;
-      padding: 20px 24px;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-      margin-bottom: 24px;
-    }
-
-    .page-header h1 {
-      font-size: 24px;
-      margin-bottom: 8px;
-    }
-
-    .page-header p {
-      color: #666;
-      font-size: 14px;
-    }
-
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-    }
-
-    .section {
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-      margin-bottom: 30px;
-    }
-
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 8px;
+      gap: 8px;
       font-weight: 600;
       color: #333;
+      margin-bottom: 8px;
       font-size: 14px;
     }
 
-    input[type="text"],
-    input[type="email"],
-    select,
-    textarea {
+    .form-group input {
       width: 100%;
-      padding: 12px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
+      padding: 12px 16px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
       font-size: 14px;
-      transition: border-color 0.3s;
+      transition: all 0.2s;
+      background: #fff;
     }
 
-    input:focus,
-    select:focus,
-    textarea:focus {
+    .form-group input:focus {
       outline: none;
       border-color: #667eea;
       box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
     }
 
+    .form-group small {
+      display: block;
+      margin-top: 6px;
+      color: #888;
+      font-size: 12px;
+    }
+
     .submit-btn {
       width: 100%;
-      padding: 12px;
+      padding: 14px 24px;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
       border: none;
-      border-radius: 5px;
+      border-radius: 8px;
       font-size: 16px;
       font-weight: 600;
       cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
+      transition: all 0.2s;
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
     }
 
     .submit-btn:hover {
@@ -157,6 +82,63 @@
       opacity: 0.6;
       cursor: not-allowed;
       transform: none;
+    }
+
+    .info-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 20px;
+      border-radius: 12px;
+      color: white;
+      margin-bottom: 24px;
+    }
+
+    .info-card h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .info-card p {
+      font-size: 13px;
+      opacity: 0.95;
+      line-height: 1.6;
+    }
+
+    .note-box {
+      background: #f0f4ff;
+      border-left: 4px solid #667eea;
+      padding: 16px;
+      border-radius: 8px;
+      margin-top: 30px;
+    }
+
+    .note-box strong {
+      color: #667eea;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .note-box p {
+      color: #555;
+      font-size: 13px;
+      line-height: 1.7;
+      margin: 0;
+    }
+
+    .blockchain-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      margin-top: 8px;
     }
 
     .message {
@@ -214,52 +196,94 @@
     }
   </style>
 </head>
-<body>
+<body class="bg-gray">
   <div class="sidebar">
     <h1>🏫 University</h1>
-    <a class="nav-link" href="overview.html">🏠 Overview</a>
-    <a class="nav-link active" href="issue-certificate.html">📜 Issue Certificate</a>
-    <a class="nav-link" href="bulk-upload.html">📤 Bulk Upload</a>
-    <a class="nav-link" href="history.html">📚 History</a>
-    <a class="nav-link" href="wallet.html">💳 Wallet & Balance</a>
+    <a href="/university/overview.html" class="nav-link">📊 Overview</a>
+    <a href="/university/issue-certificate.html" class="nav-link active">📜 Issue Certificate</a>
+    <a href="/university/bulk-upload.html" class="nav-link">📤 Bulk Upload</a>
+    <a href="/university/history.html" class="nav-link">📚 History</a>
+    <a href="/university/wallet.html" class="nav-link">💰 Wallet</a>
     <button class="logout-btn" onclick="logout()">Logout</button>
   </div>
 
   <div class="main">
-    <div class="page-header">
-      <h1>📜 Issue Single Certificate</h1>
-      <p>Issue a blockchain-verified certificate for a student</p>
+    <div class="card mb-6" style="padding: 20px 24px;">
+      <h1 class="text-2xl font-semibold mb-2">Issue Single Certificate</h1>
+      <p class="text-gray-600 text-sm">Manually issue a certificate to a student</p>
     </div>
 
-    <div class="container">
-      <div class="section">
+    <div style="max-width: 800px; margin: 0 auto;">
+      <!-- Info Card -->
+      <div class="info-card">
+        <h3>🔐 Blockchain-Verified Certificate</h3>
+        <p>Issue tamper-proof certificates stored securely on the blockchain. Each certificate is cryptographically signed and permanently recorded.</p>
+        <div class="blockchain-badge">⛓️ Polygon Network</div>
+      </div>
+
+      <div class="card p-8 mb-6">
         <div id="issueMessage" class="message"></div>
 
         <form id="issueCertForm">
           <div class="form-group">
-            <label for="student_id">Student ID (STU...) *</label>
-            <input type="text" id="student_id" name="student_id" placeholder="STU123456..." required>
-            <small style="color: #666;">Enter the registered student ID</small>
+            <label for="student_id">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+              </svg>
+              Student ID *
+            </label>
+            <input type="text" id="student_id" name="student_id" placeholder="e.g., STU123456" required>
+            <small>Enter the registered student ID (starts with STU)</small>
           </div>
 
           <div class="form-group">
-            <label for="course_name">Course/Program Name *</label>
-            <input type="text" id="course_name" name="course_name" placeholder="e.g., B.Tech Computer Science" required>
+            <label for="course_name">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+              </svg>
+              Course/Program Name *
+            </label>
+            <input type="text" id="course_name" name="course_name" placeholder="e.g., Bachelor of Computer Science" required>
+            <small>Full name of the course or degree program</small>
           </div>
 
           <div class="form-group">
-            <label for="grade">Grade/Score *</label>
-            <input type="text" id="grade" name="grade" placeholder="e.g., A, 95%, First Class" required>
+            <label for="grade">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+              </svg>
+              Grade/Score *
+            </label>
+            <input type="text" id="grade" name="grade" placeholder="e.g., A+, 95%, First Class" required>
+            <small>Final grade or score achieved by the student</small>
           </div>
 
-          <button type="submit" class="submit-btn">Issue Certificate</button>
+          <button type="submit" class="submit-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="12" y1="18" x2="12" y2="12"/>
+              <line x1="9" y1="15" x2="15" y2="15"/>
+            </svg>
+            Issue Certificate
+          </button>
         </form>
 
-        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
-          <p style="color: #666; font-size: 13px; line-height: 1.6;">
-            <strong>Note:</strong> The certificate will be stored on the blockchain. 
-            Make sure all information is accurate before submitting. The student will 
-            be able to view and share this certificate once issued.
+        <div class="note-box">
+          <strong>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="16" x2="12" y2="12"/>
+              <line x1="12" y1="8" x2="12.01" y2="8"/>
+            </svg>
+            Important Information
+          </strong>
+          <p>
+            The certificate will be permanently stored on the blockchain and cannot be modified after issuance. 
+            Please verify all details are correct before submitting. Students can view, download, and share 
+            their certificates instantly after issuance.
           </p>
         </div>
       </div>
@@ -360,8 +384,13 @@
           throw new Error(result.error || 'Failed to issue certificate');
         }
 
-        showMessage('✅ Certificate issued! ID: ' + result.certificate.certificate_id + '\nTX: ' + result.certificate.blockchain.transactionHash, 'success');
+        const certId = result.certificate.certificate_id;
+        const txHash = result.certificate.blockchain.transactionHash;
+        showMessage(`✅ Certificate issued successfully!\n\n📜 Certificate ID: ${certId}\n⛓️ Transaction: ${txHash.substring(0, 10)}...${txHash.substring(txHash.length - 8)}`, 'success');
         document.getElementById('issueCertForm').reset();
+        
+        // Scroll to message
+        document.getElementById('issueMessage').scrollIntoView({ behavior: 'smooth', block: 'center' });
       } catch (error) {
         showMessage('Error: ' + error.message, 'error');
       } finally {

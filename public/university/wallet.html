@@ -4,13 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Wallet & Balance - University Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/css/utility.css">
   <script>
-    // Early global error trap to catch synchronous load errors
     window.addEventListener('error', (event) => {
       console.error('🌋 EARLY LOAD ERROR:', event.message, 'at', event.filename, 'line', event.lineno);
-      if (event.error) {
-        console.error('   Stack:', event.error.stack);
-      }
+      if (event.error) console.error('   Stack:', event.error.stack);
     });
     window.addEventListener('unhandledrejection', (event) => {
       console.error('🌋 EARLY UNHANDLED REJECTION:', event.reason);
@@ -18,137 +20,16 @@
     });
   </script>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f5f7fa;
-      min-height: 100vh;
-      display: flex;
-    }
-
-    .sidebar {
-      width: 240px;
-      background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      padding: 24px 20px;
-      box-shadow: 4px 0 20px rgba(0,0,0,0.08);
-      position: sticky;
-      top: 0;
-      height: 100vh;
-    }
-
-    .sidebar h1 {
-      font-size: 20px;
-      margin-bottom: 24px;
-    }
-
-    .sidebar .nav-link {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 10px 12px;
-      margin-bottom: 8px;
-      border-radius: 8px;
-      color: #fff;
-      text-decoration: none;
-      background: rgba(255,255,255,0.06);
-      transition: background 0.2s;
-      font-size: 14px;
-    }
-
-    .sidebar .nav-link:hover,
-    .sidebar .nav-link.active {
-      background: rgba(255,255,255,0.12);
-    }
-
-    .sidebar .logout-btn {
-      margin-top: auto;
-      background: rgba(255,255,255,0.16);
-      border: 1px solid rgba(255,255,255,0.3);
-      color: #fff;
-      padding: 10px 12px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-
-    .main {
-      flex: 1;
-      padding: 24px 28px;
-    }
-
-    .page-header {
-      background: #fff;
-      color: #333;
-      padding: 20px 24px;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-      margin-bottom: 24px;
-    }
-
-    .page-header h1 {
-      font-size: 24px;
-      margin-bottom: 8px;
-    }
-
-    .page-header p {
-      color: #666;
-      font-size: 14px;
-    }
-
-    .container {
-      max-width: 1000px;
-      margin: 0 auto;
-    }
-
-    .section {
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-      margin-bottom: 30px;
-    }
-
-    .section h3 {
-      font-size: 20px;
-      margin-bottom: 20px;
-      color: #333;
-      border-bottom: 2px solid #f0f0f0;
-      padding-bottom: 15px;
-    }
-
-    .balance-card {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 30px;
-      border-radius: 12px;
-      margin-bottom: 30px;
-    }
-
-    .balance-card h4 {
-      font-size: 14px;
-      opacity: 0.9;
-      margin-bottom: 8px;
-      text-transform: uppercase;
-    }
-
-    .balance-card .amount {
-      font-size: 48px;
-      font-weight: bold;
-      margin-bottom: 15px;
-    }
-
-    .balance-card .currency {
-      font-size: 16px;
-      opacity: 0.9;
-    }
+    body { font-family: 'Inter', sans-serif; display: flex; }
+    .sidebar { width: 240px; background: linear-gradient(180deg, #667eea 0%, #764ba2 100%); color: #fff; display: flex; flex-direction: column; padding: 24px 20px; box-shadow: 4px 0 20px rgba(0,0,0,0.08); position: sticky; top: 0; height: 100vh; }
+    .sidebar h1 { font-size: 20px; margin-bottom: 24px; }
+    .sidebar .nav-link { display: flex; align-items: center; gap: 10px; padding: 10px 12px; margin-bottom: 8px; border-radius: 8px; color: #fff; text-decoration: none; background: rgba(255,255,255,0.06); transition: background 0.2s; font-size: 14px; }
+    .sidebar .nav-link:hover, .sidebar .nav-link.active { background: rgba(255,255,255,0.12); }
+    .sidebar .logout-btn { margin-top: auto; background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.3); color: #fff; padding: 10px 12px; border-radius: 8px; cursor: pointer; font-size: 14px; }
+    .main { flex: 1; padding: 24px 28px; }
+    .balance-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 12px; margin-bottom: 30px; }
+    .balance-card h4 { font-size: 14px; opacity: 0.9; margin-bottom: 8px; text-transform: uppercase; }
+    .balance-card .amount { font-size: 48px; font-weight: bold; margin-bottom: 15px; }
 
     .balance-row {
       display: grid;
@@ -326,25 +207,24 @@
     }
   </style>
 </head>
-<body>
+<body class="bg-gray">
   <div class="sidebar">
     <h1>🏫 University</h1>
-    <a class="nav-link" href="overview.html">🏠 Overview</a>
-    <a class="nav-link" href="issue-certificate.html">📜 Issue Certificate</a>
-    <a class="nav-link" href="bulk-upload.html">📤 Bulk Upload</a>
-    <a class="nav-link" href="history.html">📚 History</a>
-    <a class="nav-link active" href="wallet.html">💳 Wallet & Balance</a>
+    <a href="/university/overview.html" class="nav-link">� Overview</a>
+    <a href="/university/issue-certificate.html" class="nav-link">📜 Issue Certificate</a>
+    <a href="/university/bulk-upload.html" class="nav-link">📤 Bulk Upload</a>
+    <a href="/university/history.html" class="nav-link">📚 History</a>
+    <a href="/university/wallet.html" class="nav-link active">💰 Wallet</a>
     <button class="logout-btn" onclick="logout()">Logout</button>
   </div>
 
   <div class="main">
-    <div class="page-header">
-      <h1>💳 Wallet & Balance Management</h1>
-      <p>View your prepaid balance and manage certificate issuance funds</p>
+    <div class="card mb-6" style="padding: 20px 24px;">
+      <h1 class="text-2xl font-semibold mb-2">Wallet & Balance</h1>
+      <p class="text-gray-600 text-sm">Manage your institution's blockchain wallet and transaction history</p>
     </div>
 
-    <div class="container">
-      <!-- Balance Card -->
+    <div style="max-width: 1000px; margin: 0 auto;">
       <div id="balanceCard" class="balance-card" style="display: none;">
         <h4>Current Balance</h4>
         <div class="amount" id="balanceAmount">0.00</div>
@@ -610,6 +490,12 @@
         return;
       }
 
+      // Warn if deposit is too small
+      if (Number(amount) < 0.5) {
+        showDepositMessage('⚠️ Warning: Deposit amount too small!\n\nGas fees on Polygon Amoy may be 0.05-0.2 POL.\nYou need: Deposit Amount + Gas Fee\n\nRecommended minimum deposit: 0.5 POL', 'error');
+        return;
+      }
+
       const btn = document.getElementById('btnDeposit');
       btn.disabled = true;
       btn.textContent = '⏳ Processing...';
@@ -643,12 +529,12 @@
           console.log('Your balance (POL):', balPol);
           
           if (parseFloat(totalCostPol) > parseFloat(balPol)) {
-            showDepositMessage('❌ Insufficient balance. Need: ' + totalCostPol + ' POL (deposit + gas), Have: ' + balPol + ' POL', 'error');
+            showDepositMessage('❌ Insufficient balance.\n\nRequired: ' + totalCostPol + ' POL\n  └─ Deposit: ' + amount + ' POL\n  └─ Gas Fee: ' + gasCostPol + ' POL\n\nYour balance: ' + balPol + ' POL\n\n💡 Solution:\n• Get more POL from faucet\n• Try a smaller deposit amount\n• Wait for gas prices to drop', 'error');
             return;
           }
         } catch (gasErr) {
           console.error('Gas estimation failed:', gasErr);
-          showDepositMessage('❌ Contract call failed. Details: ' + (gasErr.reason || gasErr.message), 'error');
+          showDepositMessage('❌ Contract call failed. This usually means:\n\n• Network is too congested (gas prices too high)\n• RPC endpoint is having issues\n• Smart contract issue\n\n💡 Try:\n• Wait a few minutes and retry\n• Use Polygon faucet to get more POL\n• Check: https://amoy.polygonscan.com\n\nDetails: ' + (gasErr.reason || gasErr.message), 'error');
           return;
         }
         
@@ -714,6 +600,14 @@
       try {
         const token = localStorage.getItem('token');
         
+        if (!token) {
+          showError('No authentication token. Please log in again.');
+          window.location.href = '/university/login';
+          return;
+        }
+
+        console.log('📍 loadWalletInfo: Fetching dashboard...');
+        
         // Get institute info first
         const dashResponse = await fetch('/api/university/dashboard', {
           headers: {
@@ -721,17 +615,26 @@
           }
         });
 
+        console.log('📍 Dashboard response status:', dashResponse.status);
+
         if (!dashResponse.ok) {
-          throw new Error('Failed to load institute information');
+          const errorData = await dashResponse.json();
+          console.error('Dashboard error:', errorData);
+          showError('Failed to load institute: ' + (errorData.error || 'Unknown error'));
+          return;
         }
 
         const dashData = await dashResponse.json();
-        const walletAddress = dashData.institute.wallet_address;
+        console.log('📍 Dashboard data:', dashData);
+        
+        const walletAddress = dashData.institute?.wallet_address;
 
         if (!walletAddress) {
-          showError('No wallet address assigned to your institution. Please contact support.');
+          showError('No wallet address assigned to your institution. Please contact admin.');
           return;
         }
+
+        console.log('📍 Fetching balance for:', walletAddress);
 
         // Get balance from payment endpoint
         const balanceResponse = await fetch(`/api/payment/balance?address=${walletAddress}`, {
@@ -740,11 +643,17 @@
           }
         });
 
+        console.log('📍 Balance response status:', balanceResponse.status);
+
         if (!balanceResponse.ok) {
-          throw new Error('Failed to load balance information');
+          const errorData = await balanceResponse.json();
+          console.error('Balance error:', errorData);
+          showError('Failed to load balance: ' + (errorData.error || 'Unknown error'));
+          return;
         }
 
         const balanceData = await balanceResponse.json();
+        console.log('📍 Balance data:', balanceData);
 
         // Show balance card
         document.getElementById('loadingState').style.display = 'none';
@@ -760,9 +669,11 @@
         document.getElementById('prepaidBalance').textContent = balancePol;
         document.getElementById('gasSpent').textContent = gasSpentPol;
 
+        console.log('✅ Wallet info loaded successfully');
+
       } catch (error) {
-        console.error('Wallet load error:', error);
-        showError(error.message || 'Failed to load wallet information');
+        console.error('❌ Wallet load error:', error);
+        showError(error.message || 'Failed to load wallet information. Check console for details.');
       }
     }
 

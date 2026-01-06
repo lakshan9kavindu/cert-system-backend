@@ -4,189 +4,53 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Login - Certificate Verification System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/css/utility.css">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-    }
-
-    .container {
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-      overflow: hidden;
-      max-width: 400px;
-      width: 100%;
-    }
-
-    .header {
-      background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
-      color: white;
-      padding: 40px 20px;
-      text-align: center;
-    }
-
-    .header h1 {
-      font-size: 28px;
-      margin-bottom: 10px;
-    }
-
-    .header p {
-      font-size: 14px;
-      opacity: 0.9;
-    }
-
-    .form-content {
-      padding: 40px;
-    }
-
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 600;
-      color: #333;
-      font-size: 14px;
-    }
-
-    input[type="text"],
-    input[type="password"] {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      font-size: 14px;
-      transition: border-color 0.3s;
-    }
-
-    input[type="text"]:focus,
-    input[type="password"]:focus {
-      outline: none;
-      border-color: #d32f2f;
-      box-shadow: 0 0 0 3px rgba(211, 47, 47, 0.1);
-    }
-
-    .submit-btn {
-      width: 100%;
-      padding: 12px;
-      background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
-      color: white;
-      border: none;
-      border-radius: 5px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .submit-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 30px rgba(211, 47, 47, 0.3);
-    }
-
-    .submit-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .message {
-      padding: 12px;
-      border-radius: 5px;
-      margin-bottom: 20px;
-      font-size: 14px;
-      display: none;
-    }
-
-    .message.error {
-      background-color: #fee;
-      color: #c00;
-      display: block;
-    }
-
-    .message.success {
-      background-color: #efe;
-      color: #060;
-      display: block;
-    }
-
-    .info-box {
-      background-color: #fff3cd;
-      border: 1px solid #ffc107;
-      color: #856404;
-      padding: 12px;
-      border-radius: 5px;
-      margin-bottom: 20px;
-      font-size: 13px;
-    }
-
-    .back-link {
-      text-align: center;
-      margin-top: 20px;
-      padding-top: 20px;
-      border-top: 1px solid #eee;
-      color: #666;
-      font-size: 14px;
-    }
-
-    .back-link a {
-      color: #d32f2f;
-      text-decoration: none;
-      font-weight: 600;
-    }
-
-    .back-link a:hover {
-      text-decoration: underline;
-    }
+    body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%); }
+    .message { padding: 12px; border-radius: 5px; margin-bottom: 20px; font-size: 14px; display: none; }
+    .message.error { background-color: #fee; color: #c00; display: block; }
+    .message.success { background-color: #efe; color: #060; display: block; }
+    .info-box { background-color: #fff3cd; border: 1px solid #ffc107; color: #856404; padding: 12px; border-radius: 5px; margin-bottom: 20px; font-size: 13px; }
+    .admin-header { background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%); }
+    .admin-btn { background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%); }
+    .admin-btn:hover { box-shadow: 0 10px 30px rgba(211, 47, 47, 0.3); }
+    .admin-link { color: #d32f2f; }
   </style>
 </head>
-<body>
-  <div class="container">
-    <div class="header">
-      <h1>🔐 Admin Login</h1>
-      <p>Certificate System Administration</p>
+<body class="flex items-center justify-center" style="min-height: 100vh; padding: 20px;">
+  <div class="card" style="max-width: 400px; width: 100%; overflow: hidden; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);">
+    <div class="admin-header text-center" style="padding: 40px 20px;">
+      <h1 class="text-3xl font-bold text-white mb-2">🔐 Admin Login</h1>
+      <p class="text-sm text-white" style="opacity: 0.9;">System Administrator Access</p>
     </div>
 
-    <div class="form-content">
+    <div style="padding: 40px;">
+      <div id="message" class="message"></div>
       <div class="info-box">
-        💡 Default credentials for demo:<br>
-        Username: <strong>admin</strong><br>
-        Password: <strong>admin123</strong>
+        🚨 Admin access only. Unauthorized access is logged.
       </div>
 
-      <div id="message" class="message"></div>
-
       <form id="loginForm">
-        <div class="form-group">
-          <label for="username">Username</label>
-          <input type="text" id="username" name="username" required autofocus>
+        <div class="mb-5">
+          <label for="adminId" class="block mb-2 font-semibold text-sm">Admin ID</label>
+          <input type="text" id="adminId" name="adminId" class="input" required>
         </div>
 
-        <div class="form-group">
-          <label for="password">Password</label>
-          <input type="password" id="password" name="password" required>
+        <div class="mb-5">
+          <label for="password" class="block mb-2 font-semibold text-sm">Password</label>
+          <input type="password" id="password" name="password" class="input" required>
         </div>
 
-        <button type="submit" class="submit-btn">Login</button>
-
-        <div class="back-link">
-          <a href="/">← Back to Home</a>
-        </div>
+        <button type="submit" class="btn admin-btn w-full" id="submitBtn">Login</button>
       </form>
+
+      <div class="text-center mt-5 pt-5 text-gray-600 text-sm" style="border-top: 1px solid #eee;">
+        <a href="/" class="admin-link font-semibold no-underline hover:underline">← Back to Home</a>
+      </div>
     </div>
   </div>
 
@@ -197,15 +61,15 @@
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      const username = document.getElementById('username').value.trim();
+      const adminId = document.getElementById('adminId').value.trim();
       const password = document.getElementById('password').value;
 
-      if (!username || !password) {
-        showMessage('Username and password required', 'error');
+      if (!adminId || !password) {
+        showMessage('Admin ID and password required', 'error');
         return;
       }
 
-      const btn = form.querySelector('.submit-btn');
+      const btn = document.getElementById('submitBtn');
       btn.disabled = true;
       btn.textContent = 'Logging in...';
 
@@ -215,7 +79,7 @@
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ username, password })
+          body: JSON.stringify({ username: adminId, password })
         });
 
         const data = await response.json();

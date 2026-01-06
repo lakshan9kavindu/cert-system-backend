@@ -20,8 +20,8 @@ exports.registerInstitute = async (req, res) => {
     // File uploads
     const logoFile = req.files && req.files.logo ? req.files.logo[0] : null;
     const docFile = req.files && req.files.verification_doc ? req.files.verification_doc[0] : null;
-    const logo_url = logoFile ? `/uploads/institutes/${logoFile.filename}` : null;
-    const verification_doc_url = docFile ? `/uploads/institutes/${docFile.filename}` : null;
+    const logo_url = logoFile ? `/uploads/institutes/logos/${logoFile.filename}` : null;
+    const verification_doc_url = docFile ? `/uploads/institutes/documents/${docFile.filename}` : null;
 
     // Validation
     if (!institute_name || !email || !password || !wallet_address) {
@@ -185,11 +185,12 @@ exports.getProfile = async (req, res) => {
 // Get institute dashboard
 exports.getDashboard = async (req, res) => {
   try {
+    console.log('Dashboard request - institute_id:', req.user.institute_id);
     const dashboard = await Institute.getDashboard(req.user.institute_id);
     res.json(dashboard);
   } catch (error) {
     console.error('Dashboard error:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message, institute_id: req.user.institute_id });
   }
 };
 
