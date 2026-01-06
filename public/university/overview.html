@@ -10,104 +10,24 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="/css/utility.css">
   <style>
-    body { font-family: 'Inter', sans-serif; display: flex; }
+    body { font-family: 'Inter', sans-serif; display: flex; background: #f6f8fb; }
     .sidebar { width: 240px; background: linear-gradient(180deg, #667eea 0%, #764ba2 100%); color: #fff; display: flex; flex-direction: column; padding: 24px 20px; box-shadow: 4px 0 20px rgba(0,0,0,0.08); position: sticky; top: 0; height: 100vh; }
     .sidebar h1 { font-size: 20px; margin-bottom: 24px; }
     .sidebar .nav-link { display: flex; align-items: center; gap: 10px; padding: 10px 12px; margin-bottom: 8px; border-radius: 8px; color: #fff; text-decoration: none; background: rgba(255,255,255,0.06); transition: background 0.2s; font-size: 14px; }
     .sidebar .nav-link:hover, .sidebar .nav-link.active { background: rgba(255,255,255,0.12); }
     .sidebar .logout-btn { margin-top: auto; background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.3); color: #fff; padding: 10px 12px; border-radius: 8px; cursor: pointer; font-size: 14px; }
-    .main { flex: 1; padding: 24px 28px; }
-  </style>
-</head>
-<body class="bg-gray">
-  <div class="sidebar">
-    <h1>🏫 University</h1>
-    <a href="/university/overview.html" class="nav-link active">📊 Overview</a>
-    <a href="/university/dashboard.html" class="nav-link">📋 Dashboard</a>
-    <a href="/university/issue-certificate.html" class="nav-link">📜 Issue Certificate</a>
-    <a href="/university/bulk-upload.html" class="nav-link">📤 Bulk Upload</a>
-    <a href="/university/history.html" class="nav-link">📜 Certificate History</a>
-    <a href="/university/wallet.html" class="nav-link">💰 Wallet</a>
-    <button class="logout-btn" onclick="logout()">Logout</button>
-  </div>
-
-  <div class="main">
-    .status-badge {
-      display: inline-block;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-      margin-top: 10px;
-    }
-
-    .status-badge.approved {
-      background: #d4edda;
-      color: #155724;
-    }
-
-    .status-badge.pending {
-      background: #fff3cd;
-      color: #856404;
-    }
-
-    .status-badge.rejected {
-      background: #f8d7da;
-      color: #721c24;
-    }
-
-    .page-header {
-      margin-bottom: 30px;
-    }
-
-    .page-header h1 {
-      font-size: 28px;
-      font-weight: 700;
-      color: #111827;
-      margin-bottom: 8px;
-    }
-
-    .page-header p {
-      color: #6b7280;
-      font-size: 14px;
-    }
-
+    .main { flex: 1; padding: 24px 28px; overflow-y: auto; }
+    .page-header { margin-bottom: 30px; }
+    .page-header h1 { font-size: 28px; font-weight: 700; color: #111827; margin-bottom: 8px; }
+    .page-header p { color: #6b7280; font-size: 14px; }
     @media (max-width: 768px) {
-      body {
-        flex-direction: column;
-      }
-
-      .sidebar {
-        position: relative;
-        width: 100%;
-        height: auto;
-        flex-direction: row;
-        flex-wrap: wrap;
-        gap: 8px;
-        padding: 16px;
-      }
-
-      .sidebar h1 {
-        width: 100%;
-        margin-bottom: 8px;
-      }
-
-      .sidebar .nav-link {
-        flex: 1 1 30%;
-        justify-content: center;
-      }
-
-      .sidebar .logout-btn {
-        width: 100%;
-      }
-
-      .main {
-        padding: 16px;
-      }
-
-      .grid {
-        grid-template-columns: 1fr !important;
-      }
+      body { flex-direction: column; }
+      .sidebar { position: relative; width: 100%; height: auto; flex-direction: row; flex-wrap: wrap; gap: 8px; padding: 16px; }
+      .sidebar h1 { width: 100%; margin-bottom: 8px; }
+      .sidebar .nav-link { flex: 1 1 30%; justify-content: center; }
+      .sidebar .logout-btn { width: 100%; margin-top: 8px; }
+      .main { padding: 16px; }
+      .grid { grid-template-columns: 1fr !important; }
     }
   </style>
 </head>
@@ -118,7 +38,7 @@
     <a href="/university/dashboard.html" class="nav-link">📋 Dashboard</a>
     <a href="/university/issue-certificate.html" class="nav-link">📜 Issue Certificate</a>
     <a href="/university/bulk-upload.html" class="nav-link">📤 Bulk Upload</a>
-    <a href="/university/history.html" class="nav-link">📜 Certificate History</a>
+    <a href="/university/history.html" class="nav-link">📚 History</a>
     <a href="/university/wallet.html" class="nav-link">💰 Wallet</a>
     <button class="logout-btn" onclick="logout()">Logout</button>
   </div>
@@ -164,7 +84,6 @@
             <button class="btn btn-secondary">📚 View History</button>
           </a>
         </div>
-      </div>
     </div>
   </div>
 
@@ -199,20 +118,22 @@
 
         const data = await response.json();
         
-        // Update welcome card status
+        // Update status badge
         const statusDiv = document.getElementById('statusDiv');
         let statusText = '✅ Approved';
+        let badgeClass = 'badge-success';
         
         if (data.institute.verification_status === 'approved') {
-          statusDiv.className = 'status-badge approved';
+          badgeClass = 'badge-success';
           statusText = '✅ Approved';
         } else if (data.institute.verification_status === 'pending') {
-          statusDiv.className = 'status-badge pending';
+          badgeClass = 'badge-warning';
           statusText = '⏳ Pending';
         } else {
-          statusDiv.className = 'status-badge rejected';
+          badgeClass = 'badge-error';
           statusText = '❌ Rejected';
         }
+        statusDiv.className = `badge ${badgeClass}`;
         statusDiv.textContent = statusText;
         
         // Update verification status stat card

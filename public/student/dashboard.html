@@ -10,18 +10,73 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/css/utility.css">
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .certificate-card { border-left: 4px solid #667eea; transition: transform 0.2s; }
-        .certificate-card:hover { transform: translateY(-5px); }
-        .certificate-id { font-family: monospace; background: #f0f0f0; padding: 5px 10px; border-radius: 5px; font-size: 12px; }
+        body { font-family: 'Inter', sans-serif; margin: 0; padding: 0; }
+        .header-bar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px 40px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 0 !important;
+            margin: 0 !important;
+        }
+        .certificate-card { 
+            border-left: 4px solid #667eea; 
+            transition: all 0.3s ease; 
+            position: relative;
+            overflow: hidden;
+        }
+        .certificate-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, transparent 50%, rgba(102, 126, 234, 0.05) 50%);
+        }
+        .certificate-card:hover { 
+            transform: translateY(-5px); 
+            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.15);
+        }
+        .certificate-id { 
+            font-family: monospace; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 6px 12px; 
+            border-radius: 6px; 
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        .info-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #6b7280;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .info-value {
+            color: #111827;
+            font-size: 14px;
+        }
+        .blockchain-link {
+            color: #10b981;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .blockchain-link:hover {
+            color: #059669;
+            text-decoration: underline;
+        }
     </style>
 </head>
-<body class="bg-gray">
-    <div class="hero flex items-center justify-between px-10 py-5">
+<body class="bg-gray" style="margin: 0; padding: 0;">
+    <div class="header-bar flex items-center justify-between">
         <h1 class="text-2xl font-bold text-white">🎓 Certificate Verification System</h1>
         <div class="flex items-center gap-5">
-            <span id="userName" class="text-white">Loading...</span>
-            <button class="btn btn-secondary" onclick="logout()" style="border-color: white; color: white;">Logout</button>
+            <span id="userName" class="text-white font-semibold">Loading...</span>
+            <button class="btn" onclick="logout()" style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); color: white;">Logout</button>
         </div>
     </div>
 
@@ -116,50 +171,59 @@
                 return;
             }
 
-            container.className = 'grid gap-5';
+            container.className = 'grid gap-6';
             container.innerHTML = certificates.map((cert, idx) => `
-                <div class="certificate-card card p-6">
-                    <div class="flex justify-between items-start mb-4">
-                        <div>
-                            <div class="text-xl font-semibold mb-1">${cert.certificate_title}</div>
-                            <div class="text-primary text-base mb-2">${cert.course}</div>
+                <div class="certificate-card card p-8">
+                    <div class="flex justify-between items-start mb-6">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-3 mb-2">
+                                <h3 class="text-2xl font-bold text-gray-900">${cert.certificate_title}</h3>
+                                ${cert.grade ? `<span class="badge badge-info" style="font-size: 12px;">${cert.grade}</span>` : ''}
+                            </div>
+                            <div class="text-lg font-medium" style="color: #667eea;">${cert.course}</div>
+                            <div class="text-sm text-gray-500 mt-1">🏫 ${cert.institute_name}</div>
                         </div>
-                        <div class="certificate-id">${cert.certificate_id}</div>
+                        <div class="certificate-id">#${cert.certificate_id}</div>
                     </div>
-                    <div class="grid grid-cols-3 gap-4 text-gray-600 text-sm">
-                        <div class="flex flex-col">
-                            <span class="font-semibold text-gray-800 mb-1">Institution</span>
-                            <span>${cert.institute_name}</span>
-                        </div>
-                        <div class="flex flex-col">
-                            <span class="font-semibold text-gray-800 mb-1">Issued Date</span>
-                            <span>${new Date(cert.issued_date).toLocaleDateString()}</span>
+                    
+                    <div class="grid grid-cols-2 gap-6 mb-6" style="border-top: 1px solid #e5e7eb; border-bottom: 1px solid #e5e7eb; padding: 20px 0;">
+                        <div>
+                            <div class="info-label">📅 Issued Date</div>
+                            <div class="info-value">${new Date(cert.issued_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
                         </div>
                         ${cert.expiry_date ? `
-                        <div class="flex flex-col">
-                            <span class="font-semibold text-gray-800 mb-1">Expiry Date</span>
-                            <span>${new Date(cert.expiry_date).toLocaleDateString()}</span>
+                        <div>
+                            <div class="info-label">⏰ Expiry Date</div>
+                            <div class="info-value">${new Date(cert.expiry_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
                         </div>
                         ` : ''}
-                        ${cert.grade ? `
-                        <div class="flex flex-col">
-                            <span class="font-semibold text-gray-800 mb-1">Grade</span>
-                            <span>${cert.grade}</span>
-                        </div>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <div class="info-label">🔗 Blockchain Verification</div>
+                        ${cert.blockchain_tx_hash ? `
+                            <div class="flex items-center gap-2 mt-2">
+                                <span class="badge badge-success" style="font-size: 11px;">✓ Verified on Chain</span>
+                                <a href="https://amoy.polygonscan.com/tx/${cert.blockchain_tx_hash}" target="_blank" class="blockchain-link text-xs">
+                                    View on Polygonscan →
+                                </a>
+                            </div>
+                        ` : `
+                            <div class="mt-2">
+                                <span class="badge badge-warning" style="font-size: 11px;">⏳ Blockchain verification pending</span>
+                            </div>
+                        `}
+                    </div>
+                    
+                    <div class="flex gap-3">
+                        <button class="btn btn-primary flex-1" onclick="openPrintable(${idx})" style="font-size: 14px;">
+                            📄 Download Certificate
+                        </button>
+                        ${cert.blockchain_tx_hash ? `
+                        <button class="btn btn-secondary" onclick="window.open('https://amoy.polygonscan.com/tx/${cert.blockchain_tx_hash}', '_blank')" style="font-size: 14px;">
+                            🔍 Verify
+                        </button>
                         ` : ''}
-                        <div class="flex flex-col">
-                            <span class="font-semibold text-gray-800 mb-1">Blockchain TX</span>
-                            ${cert.blockchain_tx_hash ? `
-                                <span class="text-xs break-all">
-                                    <a href="https://amoy.polygonscan.com/tx/${cert.blockchain_tx_hash}" target="_blank" class="text-green-600">${cert.blockchain_tx_hash}</a>
-                                </span>
-                            ` : `
-                                <span class="text-xs text-orange-600">Pending (no tx hash yet)</span>
-                            `}
-                        </div>
-                        <div class="flex flex-col">
-                            <button class="btn btn-primary mt-2" onclick="openPrintable(${idx})">Download</button>
-                        </div>
                     </div>
                 </div>
             `).join('');

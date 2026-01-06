@@ -10,29 +10,70 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="/css/utility.css">
   <style>
-    body { padding: 1.75rem 1rem 3rem; }
-    .shell { max-width: 1100px; margin: 0 auto; }
-    .chip { padding: 0.5rem 0.75rem; background: #eef2ff; border: 1px solid #e0e7ff; border-radius: 999px; font-size: 0.8125rem; color: #4338ca; }
-    .form-row { display: flex; gap: 0.625rem; margin-bottom: 0.75rem; align-items: center; }
-    .logo { max-width: 7.5rem; max-height: 7.5rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; background: #f8fafc; padding: 0.375rem; }
-    .section-title { font-weight: 700; margin: 0.625rem 0 0.375rem; color: #0f172a; letter-spacing: 0.1px; }
-    .mono { font-family: 'Inter', monospace; font-size: 0.8125rem; word-break: break-all; }
-    a.tx { color: #1d4ed8; font-size: 0.75rem; text-decoration: none; }
-    a.tx:hover { text-decoration: underline; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(13.125rem, 1fr)); gap: 0.625rem; }
-    .label { font-weight: 600; color: #6b7280; font-size: 0.8125rem; }
-    @media (max-width: 640px) { .form-row { flex-direction: column; } .btn { width: 100%; } }
+    body { padding: 0; margin: 0; font-family: 'Inter', sans-serif; }
+    .header-bar {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 20px 40px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      margin-bottom: 30px;
+    }
+    .shell { max-width: 1100px; margin: 0 auto; padding: 0 20px 60px; }
+    .chip { padding: 8px 16px; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); border-radius: 999px; font-size: 13px; color: white; font-weight: 600; }
+    .form-row { display: flex; gap: 12px; margin-bottom: 20px; align-items: stretch; }
+    .logo { max-width: 120px; max-height: 120px; border: 2px solid #e5e7eb; border-radius: 8px; background: #f8fafc; padding: 8px; }
+    .section-title { 
+      font-weight: 700; 
+      margin: 24px 0 16px; 
+      color: #0f172a; 
+      font-size: 18px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e5e7eb;
+    }
+    .mono { font-family: 'Courier New', monospace; font-size: 13px; word-break: break-all; background: #f1f5f9; padding: 4px 8px; border-radius: 4px; }
+    a.tx { color: #10b981; font-size: 13px; text-decoration: none; font-weight: 500; }
+    a.tx:hover { text-decoration: underline; color: #059669; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 16px; }
+    .label { 
+      font-weight: 600; 
+      color: #6b7280; 
+      font-size: 11px; 
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    .value { color: #111827; font-size: 14px; }
+    .result-card {
+      border-left: 4px solid #667eea;
+      transition: all 0.3s;
+      position: relative;
+    }
+    .result-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(102, 126, 234, 0.15);
+    }
+    .badge-container {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 640px) { .form-row { flex-direction: column; } .btn { width: 100%; } .grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
-  <div class="shell">
-    <div class="hero flex items-center justify-between gap-3">
-      <div>
-        <h1 class="text-2xl font-bold m-0">Trustless Certificate Verification</h1>
-        <p class="text-sm text-gray-500 mt-2 m-0">Validate by certificate ID or user ID with on-chain proof on Polygon Amoy.</p>
+  <div class="header-bar">
+    <div class="shell" style="padding: 0;">
+      <div class="flex items-center justify-between gap-3">
+        <div>
+          <h1 class="text-2xl font-bold m-0" style="color: white; margin-bottom: 4px;">🔍 Certificate Verification</h1>
+          <p class="text-sm mt-2 m-0" style="color: rgba(255,255,255,0.9);">Validate certificates with blockchain-backed proof on Polygon Amoy</p>
+        </div>
+        <div class="chip">🌐 Public Access</div>
       </div>
-      <div class="chip">Public • No login required</div>
     </div>
+  </div>
+  
+  <div class="shell">
 
     <div class="card">
       <div class="tab-group">
@@ -117,37 +158,42 @@
     function renderCertResult(cert, onchain) {
       lastCert = cert;
       const div = document.getElementById('results');
-      const txLink = cert.blockchain_tx_hash ? `<a class="tx" target="_blank" href="https://amoy.polygonscan.com/tx/${cert.blockchain_tx_hash}">${cert.blockchain_tx_hash}</a>` : '<span class="text-yellow-600">Pending</span>';
+      const txLink = cert.blockchain_tx_hash ? `<a class="tx" target="_blank" href="https://amoy.polygonscan.com/tx/${cert.blockchain_tx_hash}">View on Polygonscan →</a>` : '<span class="badge badge-warning" style="font-size: 11px;">⏳ Pending blockchain</span>';
       div.innerHTML = `
-        <div class="card mt-3">
-          <div class="flex gap-2 flex-wrap mb-3">
-            <span class="badge-info">Certificate</span>
-            ${cert.blockchain_tx_hash ? '<span class="badge-success">On-chain recorded</span>' : '<span class="badge-warning">Awaiting chain</span>'}
-            ${onchain && onchain.verified ? '<span class="badge-success">Verified</span>' : ''}
+        <div class="card result-card mt-3 p-8">
+          <div class="badge-container">
+            <span class="badge badge-info">📜 Certificate</span>
+            ${cert.blockchain_tx_hash ? '<span class="badge badge-success">✓ On-chain Recorded</span>' : '<span class="badge badge-warning">⏳ Awaiting Blockchain</span>'}
+            ${onchain && onchain.verified ? '<span class="badge badge-success">✓ Verified</span>' : ''}
           </div>
-          <div class="section-title">Certificate</div>
+          
+          <div class="section-title">📋 Certificate Details</div>
           <div class="grid">
-            <div><div class="label">Certificate ID</div><div class="mono">${cert.certificate_id}</div></div>
-            <div><div class="label">Title</div><div>${cert.certificate_title || cert.course}</div></div>
-            <div><div class="label">Course</div><div>${cert.course}</div></div>
-            <div><div class="label">Issued</div><div>${new Date(cert.issued_date).toLocaleDateString()}</div></div>
-            ${cert.expiry_date ? `<div><div class="label">Expiry</div><div>${new Date(cert.expiry_date).toLocaleDateString()}</div></div>` : ''}
-            ${cert.grade ? `<div><div class="label">Grade</div><div>${cert.grade}</div></div>` : ''}
-            <div><div class="label">TX Hash</div><div>${txLink}</div></div>
+            <div><div class="label">Certificate ID</div><div class="mono">#${cert.certificate_id}</div></div>
+            <div><div class="label">Title</div><div class="value">${cert.certificate_title || cert.course}</div></div>
+            <div><div class="label">Course</div><div class="value">${cert.course}</div></div>
+            <div><div class="label">Issued Date</div><div class="value">${new Date(cert.issued_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</div></div>
+            ${cert.expiry_date ? `<div><div class="label">Expiry Date</div><div class="value">${new Date(cert.expiry_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</div></div>` : ''}
+            ${cert.grade ? `<div><div class="label">Grade</div><div><span class="badge badge-info">${cert.grade}</span></div></div>` : ''}
+          </div>
+          
+          <div style="margin: 20px 0; padding: 16px; background: #f8fafc; border-radius: 8px; border-left: 3px solid #10b981;">
+            <div class="label" style="margin-bottom: 8px;">🔗 Blockchain Transaction</div>
+            <div>${txLink}</div>
           </div>
 
-          <div class="section-title">Student</div>
+          <div class="section-title">🎓 Student Information</div>
           <div class="grid">
-            <div><div class="label">Name</div><div>${cert.student_name}</div></div>
-            <div><div class="label">Email</div><div>${cert.student_email}</div></div>
+            <div><div class="label">Full Name</div><div class="value">${cert.student_name}</div></div>
+            <div><div class="label">Email Address</div><div class="value">${cert.student_email}</div></div>
             <div><div class="label">User ID</div><div class="mono">${cert.user_id}</div></div>
           </div>
 
-          <div class="section-title">Institute</div>
+          <div class="section-title">🏫 Issuing Institution</div>
           <div class="grid">
-            <div><div class="label">Name</div><div>${cert.institute_name}</div></div>
-            <div><div class="label">Wallet</div><div class="mono">${cert.issuer_wallet}</div></div>
-            <div><div class="label">Logo</div><div>${cert.logo_url ? `<img class="logo" src="${cert.logo_url}" alt="logo">` : 'No logo'}</div></div>
+            <div><div class="label">Institute Name</div><div class="value">${cert.institute_name}</div></div>
+            <div><div class="label">Wallet Address</div><div class="mono">${cert.issuer_wallet}</div></div>
+            ${cert.logo_url ? `<div><div class="label">Institution Logo</div><div><img class="logo" src="${cert.logo_url}" alt="logo"></div></div>` : ''}
           </div>
 
           <div class="section-title">On-chain</div>
@@ -155,8 +201,8 @@
             ${onchain && onchain.checked ? renderOnchain(onchain) : '<span class="mono">Not checked</span>'}
           </div>
 
-          <div class="mt-3">
-            <button class="btn btn-secondary" onclick="openPrintableSingle()">Download / Print</button>
+          <div class="mt-6 pt-4" style="border-top: 1px solid #e5e7eb;">
+            <button class="btn btn-primary" onclick="openPrintableSingle()" style="font-size: 14px;">📄 Download Certificate</button>
           </div>
         </div>
       `;
@@ -176,35 +222,42 @@
       const div = document.getElementById('results');
       userCerts = certificates;
       const certList = certificates.map(c => {
-        const txLink = c.blockchain_tx_hash ? `<a class="tx" target="_blank" href="https://amoy.polygonscan.com/tx/${c.blockchain_tx_hash}">${c.blockchain_tx_hash}</a>` : '<span class="text-yellow-600">Pending</span>';
+        const txLink = c.blockchain_tx_hash ? `<a class="tx" target="_blank" href="https://amoy.polygonscan.com/tx/${c.blockchain_tx_hash}">View TX →</a>` : '<span class="badge badge-warning" style="font-size: 11px;">⏳ Pending</span>';
         return `
-          <div class="card mt-3">
-            <div class="grid">
-              <div><div class="label">Certificate</div><div class="mono">${c.certificate_id}</div></div>
-              <div><div class="label">Title</div><div>${c.certificate_title || c.course}</div></div>
-              <div><div class="label">Course</div><div>${c.course}</div></div>
-              <div><div class="label">Issued</div><div>${new Date(c.issued_date).toLocaleDateString()}</div></div>
-              ${c.expiry_date ? `<div><div class="label">Expiry</div><div>${new Date(c.expiry_date).toLocaleDateString()}</div></div>` : ''}
-              ${c.grade ? `<div><div class="label">Grade</div><div>${c.grade}</div></div>` : ''}
-              <div><div class="label">Institute</div><div>${c.institute_name}</div></div>
-              <div><div class="label">TX</div><div>${txLink}</div></div>
+          <div class="card result-card mt-3 p-6">
+            <div class="badge-container">
+              <span class="badge badge-info">📜 ${c.certificate_title || c.course}</span>
+              ${c.blockchain_tx_hash ? '<span class="badge badge-success">✓ On-chain</span>' : '<span class="badge badge-warning">⏳ Pending</span>'}
+              ${c.grade ? `<span class="badge badge-info">${c.grade}</span>` : ''}
             </div>
-            <div class="mt-3"><button class="btn btn-secondary" onclick="openPrintableFromList(${certificates.indexOf(c)})">Download / Print</button></div>
+            <div class="grid">
+              <div><div class="label">Certificate ID</div><div class="mono">#${c.certificate_id}</div></div>
+              <div><div class="label">Course</div><div class="value">${c.course}</div></div>
+              <div><div class="label">Issued Date</div><div class="value">${new Date(c.issued_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</div></div>
+              ${c.expiry_date ? `<div><div class="label">Expiry Date</div><div class="value">${new Date(c.expiry_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</div></div>` : ''}
+              <div><div class="label">Institution</div><div class="value">${c.institute_name}</div></div>
+              <div><div class="label">Blockchain</div><div>${txLink}</div></div>
+            </div>
+            <div class="mt-4"><button class="btn btn-primary" onclick="openPrintableFromList(${certificates.indexOf(c)})">📄 Download Certificate</button></div>
           </div>
         `;
       }).join('');
 
       div.innerHTML = `
-        <div class="card mt-3">
-          <div class="section-title">Student</div>
-          <div class="grid">
-            <div><div class="label">Name</div><div>${student.full_name}</div></div>
-            <div><div class="label">Email</div><div>${student.email}</div></div>
-            <div><div class="label">User ID</div><div class="mono">${student.user_id}</div></div>
-            <div><div class="label">Gender</div><div>${student.gender || ''}</div></div>
-            <div><div class="label">Birthdate</div><div>${student.birthdate ? new Date(student.birthdate).toLocaleDateString() : ''}</div></div>
+        <div class="card result-card p-8">
+          <div class="badge-container">
+            <span class="badge badge-success">🎓 Student Profile</span>
+            <span class="badge badge-info">${certificates.length} Certificate${certificates.length !== 1 ? 's' : ''}</span>
           </div>
-          <div class="section-title">Certificates (${certificates.length})</div>
+          <div class="section-title">👤 Student Information</div>
+          <div class="grid">
+            <div><div class="label">Full Name</div><div class="value">${student.full_name}</div></div>
+            <div><div class="label">Email Address</div><div class="value">${student.email}</div></div>
+            <div><div class="label">User ID</div><div class="mono">${student.user_id}</div></div>
+            ${student.gender ? `<div><div class="label">Gender</div><div class="value">${student.gender}</div></div>` : ''}
+            ${student.birthdate ? `<div><div class="label">Date of Birth</div><div class="value">${new Date(student.birthdate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</div></div>` : ''}
+          </div>
+          <div class="section-title">📚 Issued Certificates (${certificates.length})</div>
           ${certificates.length ? certList : '<div>No certificates</div>'}
         </div>
       `;
