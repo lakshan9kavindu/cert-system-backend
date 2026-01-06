@@ -30,28 +30,6 @@
     .balance-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 12px; margin-bottom: 30px; }
     .balance-card h4 { font-size: 14px; opacity: 0.9; margin-bottom: 8px; text-transform: uppercase; }
     .balance-card .amount { font-size: 48px; font-weight: bold; margin-bottom: 15px; }
-  </style>
-</head>
-<body class="bg-gray">
-  <div class="sidebar">
-    <h1>🏫 University</h1>
-    <a href="/university/overview.html" class="nav-link">📋 Overview</a>
-    <a href="/university/issue-certificate.html" class="nav-link">✍️ Issue Certificate</a>
-    <a href="/university/bulk-upload.html" class="nav-link">📄 Bulk Upload</a>
-    <a href="/university/wallet.html" class="nav-link active">💳 Wallet</a>
-    <a href="/university/history.html" class="nav-link">📅 History</a>
-    <button class="logout-btn" onclick="logout()">Logout</button>
-  </div>
-
-  <div class="main">
-    <div class="card mb-6" style="padding: 20px 24px;">
-      <h1 class="text-2xl font-semibold mb-2">Wallet & Balance</h1>
-      <p class="text-gray-600 text-sm">Manage your institution's blockchain wallet and transaction history</p>
-    </div>
-
-    <div style="max-width: 1000px; margin: 0 auto;">
-      <div class="balance-card">
-    }
 
     .balance-row {
       display: grid;
@@ -229,25 +207,24 @@
     }
   </style>
 </head>
-<body>
+<body class="bg-gray">
   <div class="sidebar">
     <h1>🏫 University</h1>
-    <a class="nav-link" href="overview.html">🏠 Overview</a>
-    <a class="nav-link" href="issue-certificate.html">📜 Issue Certificate</a>
-    <a class="nav-link" href="bulk-upload.html">📤 Bulk Upload</a>
-    <a class="nav-link" href="history.html">📚 History</a>
-    <a class="nav-link active" href="wallet.html">💳 Wallet & Balance</a>
+    <a href="/university/overview.html" class="nav-link">� Overview</a>
+    <a href="/university/issue-certificate.html" class="nav-link">📜 Issue Certificate</a>
+    <a href="/university/bulk-upload.html" class="nav-link">📤 Bulk Upload</a>
+    <a href="/university/history.html" class="nav-link">📚 History</a>
+    <a href="/university/wallet.html" class="nav-link active">💰 Wallet</a>
     <button class="logout-btn" onclick="logout()">Logout</button>
   </div>
 
   <div class="main">
-    <div class="page-header">
-      <h1>💳 Wallet & Balance Management</h1>
-      <p>View your prepaid balance and manage certificate issuance funds</p>
+    <div class="card mb-6" style="padding: 20px 24px;">
+      <h1 class="text-2xl font-semibold mb-2">Wallet & Balance</h1>
+      <p class="text-gray-600 text-sm">Manage your institution's blockchain wallet and transaction history</p>
     </div>
 
-    <div class="container">
-      <!-- Balance Card -->
+    <div style="max-width: 1000px; margin: 0 auto;">
       <div id="balanceCard" class="balance-card" style="display: none;">
         <h4>Current Balance</h4>
         <div class="amount" id="balanceAmount">0.00</div>

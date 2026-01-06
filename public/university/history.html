@@ -24,39 +24,6 @@
     .message { padding: 12px; border-radius: 5px; margin-bottom: 20px; font-size: 14px; display: none; }
     .message.error { background-color: #fee; color: #c00; display: block; }
     .message.success { background-color: #efe; color: #060; display: block; }
-  </style>
-</head>
-<body class="bg-gray">
-  <div class="sidebar">
-    <h1>🏫 University</h1>
-    <a href="/university/overview.html" class="nav-link">📋 Overview</a>
-    <a href="/university/issue-certificate.html" class="nav-link">✍️ Issue Certificate</a>
-    <a href="/university/bulk-upload.html" class="nav-link">📄 Bulk Upload</a>
-    <a href="/university/wallet.html" class="nav-link">💳 Wallet</a>
-    <a href="/university/history.html" class="nav-link active">📅 History</a>
-    <button class="logout-btn" onclick="logout()">Logout</button>
-  </div>
-
-  <div class="main">
-    <div class="card mb-6" style="padding: 20px 24px;">
-      <h1 class="text-2xl font-semibold mb-2">Certificate History</h1>
-      <p class="text-gray-600 text-sm">View all certificates issued by your institution</p>
-    </div>
-
-    <div style="max-width: 1400px; margin: 0 auto;">
-      <div class="card p-8 mb-6">
-
-    .message.error {
-      background-color: #fee;
-      color: #c00;
-      display: block;
-    }
-
-    .message.success {
-      background-color: #efe;
-      color: #060;
-      display: block;
-    }
 
     @media (max-width: 768px) {
       body {
@@ -102,25 +69,25 @@
     }
   </style>
 </head>
-<body>
+<body class="bg-gray">
   <div class="sidebar">
     <h1>🏫 University</h1>
-    <a class="nav-link" href="overview.html">🏠 Overview</a>
-    <a class="nav-link" href="issue-certificate.html">📜 Issue Certificate</a>
-    <a class="nav-link" href="bulk-upload.html">📤 Bulk Upload</a>
-    <a class="nav-link active" href="history.html">📚 History</a>
-    <a class="nav-link" href="wallet.html">💳 Wallet & Balance</a>
+    <a href="/university/overview.html" class="nav-link">� Overview</a>
+    <a href="/university/issue-certificate.html" class="nav-link">📜 Issue Certificate</a>
+    <a href="/university/bulk-upload.html" class="nav-link">📤 Bulk Upload</a>
+    <a href="/university/history.html" class="nav-link active">📚 History</a>
+    <a href="/university/wallet.html" class="nav-link">💰 Wallet</a>
     <button class="logout-btn" onclick="logout()">Logout</button>
   </div>
 
   <div class="main">
-    <div class="page-header">
-      <h1>📚 Issued Certificates History</h1>
-      <p>View all certificates issued by your institution</p>
+    <div class="card mb-6" style="padding: 20px 24px;">
+      <h1 class="text-2xl font-semibold mb-2">Certificate History</h1>
+      <p class="text-gray-600 text-sm">View all certificates issued by your institution</p>
     </div>
 
-    <div class="container">
-      <div class="section">
+    <div style="max-width: 1400px; margin: 0 auto;">
+      <div class="card p-8 mb-6">
         <div id="historyMessage" class="message"></div>
         <div id="certificateList"></div>
       </div>
