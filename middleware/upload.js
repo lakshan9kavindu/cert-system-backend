@@ -9,12 +9,22 @@ const ensureDir = (dir) => {
   }
 };
 
-const uploadBase = path.join(__dirname, '..', 'public', 'uploads', 'institutes');
-ensureDir(uploadBase);
+const logoDir = path.join(__dirname, '..', 'public', 'uploads', 'institutes', 'logos');
+const docDir = path.join(__dirname, '..', 'public', 'uploads', 'institutes', 'documents');
+
+ensureDir(logoDir);
+ensureDir(docDir);
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, uploadBase);
+    // Route to appropriate folder based on field name
+    if (file.fieldname === 'logo') {
+      cb(null, logoDir);
+    } else if (file.fieldname === 'verification_doc') {
+      cb(null, docDir);
+    } else {
+      cb(null, logoDir); // default
+    }
   },
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname) || '';

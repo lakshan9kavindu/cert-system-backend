@@ -211,7 +211,7 @@
                     ${inst.logo_url ? `<img src="${inst.logo_url}" alt="logo" style="max-width:60px; max-height:60px; border:1px solid #eee; border-radius:4px;">` : '<span style="color:#999">No logo</span>'}
                   </td>
                   <td>
-                    ${inst.verification_doc_url ? `<a href="${inst.verification_doc_url}" target="_blank">View doc</a>` : '<span style="color:#999">No doc</span>'}
+                    ${inst.verification_doc_url ? `<a href="javascript:void(0)" onclick="viewDocument('${inst.verification_doc_url.split('/').pop()}')">View doc</a>` : '<span style="color:#999">No doc</span>'}
                   </td>
                   <td>${new Date(inst.created_at).toLocaleDateString()}</td>
                   <td>
@@ -296,6 +296,29 @@
         }, 1500);
       } catch (error) {
         showMessage('Error: ' + error.message, 'error');
+      }
+    }
+
+    // View document with authentication
+    async function viewDocument(filename) {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`/api/files/${filename}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) {
+          showMessage('Cannot view document: ' + response.statusText, 'error');
+          return;
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        window.open(url, '_blank');
+      } catch (error) {
+        showMessage('Error viewing document: ' + error.message, 'error');
       }
     }
 

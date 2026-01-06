@@ -3,6 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const jwt = require('jsonwebtoken');
 
 const app = express();
 
@@ -12,7 +13,42 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Import auth middleware
+const { verifyToken } = require('./middleware/auth');
+const fs = require('fs');
+
+// Public: logos (no auth required)
+app.use('/uploads/institutes/logos', express.static('public/uploads/institutes/logos'));
+
+// Private: documents (requires authentication)
+app.use('/uploads/institutes/documents', verifyToken, express.static('public/uploads/institutes/documents'));
+
+// Public static files
 app.use(express.static('public'));
+
+// Protected API endpoint for documents (requires authentication)
+app.get('/api/files/:filename', verifyToken, (req, res) => {
+  const filename = req.params.filename;
+  const filepath = path.join(__dirname, 'public', 'uploads', 'institutes', 'documents', filename);
+  
+  // Prevent directory traversal attacks
+  const realpath = path.resolve(filepath);
+  const allowedDir = path.resolve(path.join(__dirname, 'public', 'uploads', 'institutes', 'documents'));
+  
+  if (!realpath.startsWith(allowedDir)) {
+    return res.status(403).json({ error: 'Access denied' });
+  }
+  
+  if (!fs.existsSync(filepath)) {
+    return res.status(404).json({ error: 'File not found' });
+  }
+  
+  // Set proper content type for PDFs
+  res.setHeader('Content-Type', 'application/pdf');
+  res.setHeader('Content-Disposition', 'inline; filename=' + path.basename(filepath));
+  res.sendFile(filepath);
+});
 
 // =========================================
 // DATABASE CONNECTION TEST
