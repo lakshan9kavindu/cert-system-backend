@@ -24,9 +24,6 @@ app.use('/uploads/institutes/logos', express.static('public/uploads/institutes/l
 // Private: documents (requires authentication)
 app.use('/uploads/institutes/documents', verifyToken, express.static('public/uploads/institutes/documents'));
 
-// Public static files
-app.use(express.static('public'));
-
 // Protected API endpoint for documents (requires authentication)
 app.get('/api/files/:filename', verifyToken, (req, res) => {
   const filename = req.params.filename;
@@ -75,55 +72,6 @@ app.use('/api/payment', paymentRoutes);
 app.use('/api/verify', verifyRoutes);
 
 // =========================================
-// FRONTEND ROUTES
-// =========================================
-
-// Home page
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-// Student pages
-app.get('/student/register', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'student', 'register.html'));
-});
-
-app.get('/student/login', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'student', 'login.html'));
-});
-
-app.get('/student/dashboard', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'student', 'dashboard.html'));
-});
-
-// University pages
-app.get('/university/register', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'university', 'register.html'));
-});
-
-app.get('/university/login', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'university', 'login.html'));
-});
-
-app.get('/university/dashboard', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'university', 'dashboard.html'));
-});
-
-// Admin pages
-app.get('/admin/login', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'admin', 'login.html'));
-});
-
-app.get('/admin/dashboard', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'admin', 'dashboard.html'));
-});
-
-// Public verification page
-app.get('/verify', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'verify.html'));
-});
-
-// =========================================
 // HEALTH CHECK
 // =========================================
 app.get('/api/health', (req, res) => {
@@ -150,18 +98,19 @@ app.use((err, req, res, next) => {
 // =========================================
 // START SERVER
 // =========================================
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => {
-  console.log('\n🎓 Certificate Verification System');
+  console.log('\n🎓 Certificate Verification System - Backend API');
   console.log('=====================================');
   console.log(`✅ Server running on http://localhost:${PORT}`);
   console.log(`✅ Contract: ${process.env.CONTRACT_ADDRESS}`);
-  console.log('\n📱 Access Points:');
-  console.log(`   Student Portal: http://localhost:${PORT}/student/login`);
-  console.log(`   University Portal: http://localhost:${PORT}/university/login`);
-  console.log(`   Admin Panel: http://localhost:${PORT}/admin/login`);
-  console.log(`   Public Verify: http://localhost:${PORT}/verify`);
+  console.log('\n📱 API Endpoints:');
+  console.log(`   Auth: http://localhost:${PORT}/api/auth/*`);
+  console.log(`   Student: http://localhost:${PORT}/api/student/*`);
+  console.log(`   University: http://localhost:${PORT}/api/university/*`);
+  console.log(`   Admin: http://localhost:${PORT}/api/admin/*`);
+  console.log(`   Verify: http://localhost:${PORT}/api/verify/*`);
   console.log(`   Health Check: http://localhost:${PORT}/api/health`);
   console.log('=====================================\n');
 });
