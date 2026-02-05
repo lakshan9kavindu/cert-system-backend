@@ -96,27 +96,7 @@ class Institute {
     }
   }
 
-  // Get approved institutes
-  static async getApproved() {
-    try {
-      const query = 'SELECT * FROM institutes WHERE verification_status = ? ORDER BY institute_name';
-      const [rows] = await db.execute(query, ['approved']);
-      return rows;
-    } catch (error) {
-      throw new Error(`Failed to get approved institutes: ${error.message}`);
-    }
-  }
 
-  // Update verification status
-  static async updateStatus(institute_id, status) {
-    try {
-      const query = 'UPDATE institutes SET verification_status = ?, updated_at = CURRENT_TIMESTAMP WHERE institute_id = ?';
-      await db.execute(query, [status, institute_id]);
-      return true;
-    } catch (error) {
-      throw new Error(`Failed to update institute status: ${error.message}`);
-    }
-  }
 
   // Get institute dashboard info
   static async getDashboard(institute_id) {
