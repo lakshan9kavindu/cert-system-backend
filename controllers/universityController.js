@@ -648,12 +648,13 @@ exports.bulkIssueWithSingleSignature = async (req, res) => {
       const courseName_normalized = courseName || course_name;
       const issueDate_normalized = issueDate || issued_date;
       const issuerName_normalized = issuerName || instRows[0].institute_name || 'Unknown';
+      const student_id_from_cert = cert.student_id;
 
       // Validate required fields
       if (!certId_normalized || !courseName_normalized || !issueDate_normalized) {
         results.push({
           certificate_id: certId_normalized,
-          student_id: cert.student_id,
+          student_id: student_id_from_cert,
           success: false,
           error: 'Missing required fields (certId/certificate_id, courseName/course_name, issueDate/issued_date)'
         });
@@ -663,10 +664,14 @@ exports.bulkIssueWithSingleSignature = async (req, res) => {
       try {
         console.log(`\n📋 Processing certificate ${i + 1}/${certificates.length}: ${certId_normalized}`);
 
+        // Initialize student_id from cert if provided
+        let student_id = student_id_from_cert;
+        let gradeValue = grade;
+
         // Get student name if not provided
-        if (!studentName_normalized && cert.student_id) {
-          console.log(`   🔍 Fetching student name for ${cert.student_id}...`);
-          const [sRows] = await db.execute('SELECT full_name FROM students WHERE user_id = ?', [cert.student_id]);
+        if (!studentName_normalized && student_id) {
+          console.log(`   🔍 Fetching student name for ${student_id}...`);
+          const [sRows] = await db.execute('SELECT full_name FROM students WHERE user_id = ?', [student_id]);
           if (sRows.length > 0) {
             studentName_normalized = sRows[0].full_name;
             console.log(`   ✓ Found: ${studentName_normalized}`);
@@ -674,7 +679,7 @@ exports.bulkIssueWithSingleSignature = async (req, res) => {
         }
 
         if (!studentName_normalized) {
-          studentName_normalized = `Student_${cert.student_id || 'Unknown'}`;
+          studentName_normalized = `Student_${student_id || 'Unknown'}`;
         }
 
         const certData = {
@@ -712,7 +717,26 @@ exports.bulkIssueWithSingleSignature = async (req, res) => {
         const blockchainStatus = txResult.status === 1 ? 'confirmed' : 'submitted';
         const blockchainTimestamp = new Date();
 
-        // Step 3: Store in database with blockchain data
+        // Step 3: Fetch existing certificate to get student_id
+        console.log(`   🔍 Fetching existing certificate from DB...`);
+        const [existingCerts] = await db.execute(
+          'SELECT user_id, grade FROM certificates WHERE certificate_id = ?',
+          [certId_normalized]
+        );
+
+        if (existingCerts.length > 0) {
+          console.log(`   ✓ Found existing certificate`);
+          student_id = existingCerts[0].user_id;
+          gradeValue = gradeValue || existingCerts[0].grade;
+          console.log(`   ✓ Student ID: ${student_id}, Grade: ${gradeValue}`);
+        } else {
+          console.log(`   ⚠️  No existing certificate found, will create new record`);
+          if (!student_id) {
+            throw new Error('student_id is required for new certificates');
+          }
+        }
+
+        // Step 4: Store/Update in database with blockchain data
         const insertQuery = `
           INSERT INTO certificates 
           (certificate_id, user_id, institute_id, certificate_title, course, issued_date, grade, blockchain_tx_hash, blockchain_status, blockchain_timestamp)
@@ -726,12 +750,12 @@ exports.bulkIssueWithSingleSignature = async (req, res) => {
         console.log(`   💾 Storing in database...`);
         await db.execute(insertQuery, [
           certId_normalized ?? null,
-          cert.student_id ?? null,
+          student_id ?? null,
           req.user.institute_id ?? null,
           courseName_normalized ?? null,
           courseName_normalized ?? null,
           issueDate_normalized ?? null,
-          grade ?? null,
+          gradeValue ?? null,
           txResult.txHash,
           blockchainStatus,
           blockchainTimestamp
@@ -739,10 +763,10 @@ exports.bulkIssueWithSingleSignature = async (req, res) => {
 
         console.log(`   ✓ Database updated successfully`);
 
-        // Step 4: Add to results
+        // Step 5: Add to results
         results.push({
           certificate_id: certId_normalized,
-          student_id: cert.student_id,
+          student_id: student_id,
           blockchain_tx_hash: txResult.txHash,
           blockchain_status: blockchainStatus,
           blockchain_block: txResult.blockNumber,
@@ -754,9 +778,23 @@ exports.bulkIssueWithSingleSignature = async (req, res) => {
         console.error(`   ❌ Error processing certificate ${certId_normalized}:`, err.message);
         console.error(`   Stack:`, err.stack);
 
+        // Try to get student_id from error context or existing certificate
+        let errorStudentId = student_id_from_cert;
+        try {
+          const [existingCerts] = await db.execute(
+            'SELECT user_id FROM certificates WHERE certificate_id = ?',
+            [certId_normalized || certId || certificate_id]
+          );
+          if (existingCerts.length > 0) {
+            errorStudentId = existingCerts[0].user_id;
+          }
+        } catch (lookupErr) {
+          // Ignore lookup errors in error handler
+        }
+
         results.push({
           certificate_id: certId || certificate_id,
-          student_id: cert.student_id,
+          student_id: errorStudentId,
           success: false,
           error: err.message,
           blockchain_status: 'failed'
