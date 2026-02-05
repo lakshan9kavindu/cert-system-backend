@@ -9,5 +9,6 @@ router.get('/dashboard', verifyStudent, studentController.getDashboard);
 router.get('/certificates', verifyStudent, studentController.getCertificates);
 router.get('/certificates/:certificateId', verifyStudent, studentController.getCertificateDetails);
 router.get('/certificates/:certificateId/verify', verifyStudent, studentController.verifyCertificateOnBlockchain);
+router.post('/career-insights', verifyStudent, studentController.getCareerInsights);
 
 module.exports = router;

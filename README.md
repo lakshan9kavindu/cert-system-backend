@@ -1,55 +1,106 @@
-# Certificate Verification System - API Documentation
+# Blockchain Certificate Verification System - API Documentation
 
-**Base URL:** `http://localhost:3001`  
-**Version:** 1.0  
-**Last Updated:** January 8, 2026
-
----
-
-## Table of Contents
-1. [Authentication](#authentication)
-2. [Student API](#student-api)
-3. [University API](#university-api)
-4. [Admin API](#admin-api)
-5. [Public Verify API](#public-verify-api)
-6. [File Upload](#file-upload)
-7. [Error Handling](#error-handling)
-8. [Data Models](#data-models)
+**Version:** 2.0  
+**Status:** Production Ready  
+**Last Updated:** February 5, 2026  
+**Base URL:** `http://localhost:3001`
 
 ---
 
-## Authentication
+## 📖 Table of Contents
 
-### JWT Token Authentication
+1. [Quick Start](#quick-start)
+2. [Setup & Configuration](#setup--configuration)
+3. [Authentication](#authentication)
+4. [Student API](#student-api)
+5. [University API](#university-api)
+6. [Admin API](#admin-api)
+7. [Public Verify API](#public-verify-api)
+8. [AI Career Insights](#ai-career-insights) ⭐ NEW
+9. [Data Models](#data-models)
+10. [Error Handling](#error-handling)
+11. [Frontend Integration](#frontend-integration)
 
-All protected endpoints require a JWT token in the `Authorization` header:
+---
 
+## 🚀 Quick Start
+
+### Installation
+```bash
+npm install
+npm start
+```
+
+### Add Gemini API Key (for AI features)
+```bash
+# Edit .env
+GEMINI_API_KEY=your_api_key_from_https://aistudio.google.com/app/apikey
+```
+
+### Test Endpoints
+```bash
+# Student Dashboard
+curl -X GET http://localhost:3001/api/student/dashboard \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+
+# Career Insights (AI)
+curl -X POST http://localhost:3001/api/student/career-insights \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"regenerate": false}'
+```
+
+---
+
+## ⚙️ Setup & Configuration
+
+### Environment Variables (.env)
+```dotenv
+# Server
+PORT=3001
+NODE_ENV=development
+
+# Database (MySQL)
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=
+DB_NAME=cert_verification_system
+
+# Security
+JWT_SECRET=ABHe3oGyRh1EfsUq2ZnzQj0vVPiFLdtu
+SESSION_SECRET=WLJr5tywHnCqReM8auTNY21j0cPgVOsk
+
+# Blockchain
+RPC_URL=https://rpc-amoy.polygon.technology
+RELAYER_PRIVATE_KEY=your_private_key
+CONTRACT_ADDRESS=0x13660206fF34b48b07422a6658BfD93242b6a126
+
+# AI (Required for Career Insights)
+GEMINI_API_KEY=your_gemini_api_key_here
+```
+
+---
+
+## 🔐 Authentication
+
+### JWT Token
+All protected endpoints require JWT in Authorization header:
 ```http
-Authorization: Bearer <your_jwt_token>
+Authorization: Bearer <token>
 ```
 
-**Token Expiry:** 7 days  
-**Token Payload:**
-```json
-{
-  "userId": "string" or "institute_id": "string" or "admin_id": "string",
-  "role": "student" | "university" | "admin",
-  "iat": 1234567890,
-  "exp": 1234567890
-}
-```
+**Token Details:**
+- Expiry: 7 days
+- Format: Standard JWT with userId and role
 
 ---
 
-## Student API
+## 👨‍🎓 Student API
 
 ### 1. Register Student
-
 **POST** `/api/auth/student/register`
 
-Register a new student account.
-
-**Request Body:**
 ```json
 {
   "full_name": "John Doe",
@@ -60,43 +111,24 @@ Register a new student account.
 }
 ```
 
-**Validation:**
-- `email`: Valid email format required
-- `password`: Minimum 6 characters
-- `gender`: Must be "Male", "Female", or "Other"
-- `birthdate`: Date format (YYYY-MM-DD)
-
 **Response (201):**
 ```json
 {
   "success": true,
-  "message": "Student registered successfully",
-  "userId": "STU123456789",
-  "token": "eyJhbGciOiJIUzI1NiIs...",
+  "token": "eyJhbGc...",
   "student": {
     "userId": "STU123456789",
     "full_name": "John Doe",
-    "email": "john@example.com",
-    "gender": "Male",
-    "birthdate": "2000-01-15"
+    "email": "john@example.com"
   }
 }
 ```
 
-**Errors:**
-- `400`: Missing fields, invalid email/password format
-- `400`: Email already registered
-- `500`: Server error
-
 ---
 
-### 2. Student Login
-
+### 2. Login
 **POST** `/api/auth/student/login`
 
-Authenticate a student and get JWT token.
-
-**Request Body:**
 ```json
 {
   "email": "john@example.com",
@@ -108,35 +140,20 @@ Authenticate a student and get JWT token.
 ```json
 {
   "success": true,
-  "message": "Login successful",
-  "token": "eyJhbGciOiJIUzI1NiIs...",
+  "token": "eyJhbGc...",
   "student": {
     "userId": "STU123456789",
     "full_name": "John Doe",
-    "email": "john@example.com",
-    "gender": "Male",
-    "birthdate": "2000-01-15"
+    "email": "john@example.com"
   }
 }
 ```
 
-**Errors:**
-- `400`: Missing email or password
-- `401`: Invalid credentials
-- `500`: Server error
-
 ---
 
-### 3. Get Student Profile
-
-**GET** `/api/auth/student/profile`
-
-Get current authenticated student's profile.
-
-**Headers:**
-```http
-Authorization: Bearer <token>
-```
+### 3. Get Profile
+**GET** `/api/auth/student/profile`  
+**Auth:** Required
 
 **Response (200):**
 ```json
@@ -147,29 +164,16 @@ Authorization: Bearer <token>
     "full_name": "John Doe",
     "email": "john@example.com",
     "gender": "Male",
-    "birthdate": "2000-01-15",
-    "created_at": "2026-01-01T00:00:00.000Z"
+    "birthdate": "2000-01-15"
   }
 }
 ```
 
-**Errors:**
-- `403`: No token provided
-- `401`: Invalid/expired token
-- `404`: Student not found
-
 ---
 
-### 4. Get Student Dashboard
-
-**GET** `/api/student/dashboard`
-
-Get dashboard data including student info and certificates count.
-
-**Headers:**
-```http
-Authorization: Bearer <student_token>
-```
+### 4. Get Dashboard (Enhanced) ⭐ NEW
+**GET** `/api/student/dashboard`  
+**Auth:** Required
 
 **Response (200):**
 ```json
@@ -178,37 +182,31 @@ Authorization: Bearer <student_token>
   "student": {
     "userId": "STU123456789",
     "full_name": "John Doe",
-    "email": "john@example.com",
-    "gender": "Male",
-    "birthdate": "2000-01-15"
+    "email": "john@example.com"
   },
-  "certificates": [
+  "certificates": [{...}],
+  "statistics": {
+    "totalCertificates": 3,
+    "blockchainVerifiedCount": 2,
+    "institutionsCount": 2,
+    "activeCertificatesCount": 2
+  },
+  "institutions": [
     {
-      "certificate_id": "CERT123",
-      "certificate_title": "Blockchain Certification",
-      "course": "Blockchain Fundamentals",
+      "institute_id": "UNI456",
       "institute_name": "Tech University",
-      "issued_date": "2026-01-01",
-      "grade": "A",
-      "blockchain_tx_hash": "0x123..."
+      "logo_url": "/uploads/...",
+      "certificateCount": 2
     }
-  ],
-  "totalCertificates": 1
+  ]
 }
 ```
 
 ---
 
 ### 5. Get All Certificates
-
-**GET** `/api/student/certificates`
-
-Get all certificates for the authenticated student.
-
-**Headers:**
-```http
-Authorization: Bearer <student_token>
-```
+**GET** `/api/student/certificates`  
+**Auth:** Required
 
 **Response (200):**
 ```json
@@ -217,16 +215,12 @@ Authorization: Bearer <student_token>
   "certificates": [
     {
       "certificate_id": "CERT123",
-      "user_id": "STU123456789",
-      "institute_id": "UNI456",
-      "certificate_title": "Blockchain Certification",
+      "certificate_title": "Blockchain Cert",
       "course": "Blockchain Fundamentals",
-      "issued_date": "2026-01-01",
-      "expiry_date": null,
-      "grade": "A",
-      "blockchain_tx_hash": "0x123...",
       "institute_name": "Tech University",
-      "logo_url": "/uploads/institutes/logos/uni-logo.png"
+      "issued_date": "2026-01-01",
+      "grade": "A",
+      "blockchain_tx_hash": "0x123..."
     }
   ]
 }
@@ -235,18 +229,8 @@ Authorization: Bearer <student_token>
 ---
 
 ### 6. Get Certificate Details
-
-**GET** `/api/student/certificates/:certificateId`
-
-Get detailed information for a specific certificate.
-
-**Parameters:**
-- `certificateId` (path): The certificate ID
-
-**Headers:**
-```http
-Authorization: Bearer <student_token>
-```
+**GET** `/api/student/certificates/:certificateId`  
+**Auth:** Required
 
 **Response (200):**
 ```json
@@ -254,146 +238,54 @@ Authorization: Bearer <student_token>
   "success": true,
   "certificate": {
     "certificate_id": "CERT123",
-    "user_id": "STU123456789",
-    "institute_id": "UNI456",
     "certificate_title": "Blockchain Certification",
     "course": "Blockchain Fundamentals",
     "issued_date": "2026-01-01",
     "grade": "A",
-    "blockchain_tx_hash": "0x123...",
     "institute_name": "Tech University",
-    "issuer_wallet": "0xABC...",
-    "logo_url": "/uploads/institutes/logos/uni-logo.png"
+    "logo_url": "/uploads/...",
+    "blockchain_tx_hash": "0x123..."
   }
 }
 ```
 
-**Errors:**
-- `404`: Certificate not found or not owned by student
-
 ---
 
-### 7. Verify Certificate on Blockchain
-
-**GET** `/api/student/certificates/:certificateId/verify`
-
-Verify a certificate against blockchain data.
-
-**Parameters:**
-- `certificateId` (path): The certificate ID
-
-**Headers:**
-```http
-Authorization: Bearer <student_token>
-```
+### 7. Verify on Blockchain
+**GET** `/api/student/certificates/:certificateId/verify`  
+**Auth:** Required
 
 **Response (200):**
 ```json
 {
   "verified": true,
   "onBlockchain": true,
-  "databaseCert": {
-    "certificateId": "CERT123",
-    "courseName": "Blockchain Fundamentals",
-    "grade": "A",
-    "issueDate": "2026-01-01",
-    "issuerName": "Tech University",
-    "transactionHash": "0x123..."
-  },
-  "blockchainCert": {
-    "certificateId": "CERT123",
-    "studentName": "John Doe",
-    "courseName": "Blockchain Fundamentals",
-    "issueDate": "2026-01-01",
-    "issuerName": "Tech University"
-  },
-  "comparison": {
-    "match": true
-  },
   "message": "✅ Certificate verified on blockchain!"
 }
 ```
 
 ---
 
-## University API
+## 🎓 University API
 
 ### 1. Register University
-
-**POST** `/api/university/register`
-
-Register a new university/institute (requires admin approval).
-
+**POST** `/api/university/register`  
 **Content-Type:** `multipart/form-data`
 
-**Form Fields:**
-- `institute_name`: string (required)
-- `email`: string (required, unique)
-- `password`: string (required, min 6 chars)
-- `wallet_address`: string (required, must start with 0x, 42 chars)
-- `logo`: file (optional, image)
-- `verification_doc`: file (required, PDF/document for admin verification)
-
-**Example (using FormData):**
-```javascript
-const formData = new FormData();
-formData.append('institute_name', 'Tech University');
-formData.append('email', 'admin@techuni.edu');
-formData.append('password', 'securePass123');
-formData.append('wallet_address', '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb');
-formData.append('logo', logoFile); // File object
-formData.append('verification_doc', docFile); // File object
-
-fetch('http://localhost:3001/api/university/register', {
-  method: 'POST',
-  body: formData
-});
-```
+**Fields:**
+- `institute_name`: String (required)
+- `email`: String (required, unique)
+- `password`: String (required, min 6 chars)
+- `wallet_address`: String (required, 0x + 40 hex chars)
+- `logo`: File (optional, image)
+- `verification_doc`: File (required, PDF/document)
 
 **Response (201):**
 ```json
 {
-  "message": "Institute registered successfully. Awaiting admin approval.",
-  "token": "eyJhbGciOiJIUzI1NiIs...",
-  "institute": {
-    "institute_id": "UNI456",
-    "institute_name": "Tech University",
-    "email": "admin@techuni.edu",
-    "logo_url": "/uploads/institutes/logos/logo-123.png",
-    "verification_doc_url": "/uploads/institutes/documents/doc-123.pdf"
-  }
-}
-```
-
-**Errors:**
-- `400`: Missing required fields
-- `400`: Invalid email/wallet format
-- `400`: Password too short
-- `400`: Verification document required
-- `409`: Email or wallet already registered
-- `500`: Server error
-
----
-
-### 2. University Login
-
-**POST** `/api/university/login`
-
-Authenticate a university account.
-
-**Request Body:**
-```json
-{
-  "email": "admin@techuni.edu",
-  "password": "securePass123"
-}
-```
-
-**Response (200):**
-```json
-{
-  "message": "Login successful",
-  "token": "eyJhbGciOiJIUzI1NiIs...",
+  "success": true,
+  "message": "Institute registered. Awaiting admin approval.",
+  "token": "eyJhbGc...",
   "institute": {
     "institute_id": "UNI456",
     "institute_name": "Tech University",
@@ -402,24 +294,35 @@ Authenticate a university account.
 }
 ```
 
-**Errors:**
-- `400`: Missing email or password
-- `401`: Invalid credentials
-- `403`: Institute not approved (status: pending/rejected)
-- `500`: Server error
+---
+
+### 2. Login
+**POST** `/api/university/login`
+
+```json
+{
+  "email": "admin@techuni.edu",
+  "password": "password123"
+}
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "token": "eyJhbGc...",
+  "institute": {
+    "institute_id": "UNI456",
+    "institute_name": "Tech University"
+  }
+}
+```
 
 ---
 
-### 3. Get University Profile
-
-**GET** `/api/university/profile`
-
-Get current authenticated university's profile.
-
-**Headers:**
-```http
-Authorization: Bearer <university_token>
-```
+### 3. Get Profile
+**GET** `/api/university/profile`  
+**Auth:** Required
 
 **Response (200):**
 ```json
@@ -428,27 +331,19 @@ Authorization: Bearer <university_token>
     "institute_id": "UNI456",
     "institute_name": "Tech University",
     "email": "admin@techuni.edu",
-    "wallet_address": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
+    "wallet_address": "0x742d...",
     "verification_status": "approved",
-    "logo_url": "/uploads/institutes/logos/logo-123.png",
-    "verification_doc_url": "/uploads/institutes/documents/doc-123.pdf",
-    "created_at": "2026-01-01T00:00:00.000Z"
+    "logo_url": "/uploads/...",
+    "created_at": "2026-01-01T00:00:00Z"
   }
 }
 ```
 
 ---
 
-### 4. Get University Dashboard
-
-**GET** `/api/university/dashboard`
-
-Get dashboard statistics for the university.
-
-**Headers:**
-```http
-Authorization: Bearer <university_token>
-```
+### 4. Get Dashboard
+**GET** `/api/university/dashboard`  
+**Auth:** Required
 
 **Response (200):**
 ```json
@@ -469,17 +364,9 @@ Authorization: Bearer <university_token>
 ---
 
 ### 5. Issue Certificate
+**POST** `/api/university/certificate/issue`  
+**Auth:** Required
 
-**POST** `/api/university/certificate/issue`
-
-Issue a new certificate to a student (stored in DB and blockchain).
-
-**Headers:**
-```http
-Authorization: Bearer <university_token>
-```
-
-**Request Body:**
 ```json
 {
   "student_id": "STU123456789",
@@ -497,110 +384,17 @@ Authorization: Bearer <university_token>
     "certificate_id": "CERT123",
     "student_id": "STU123456789",
     "course_name": "Blockchain Fundamentals",
-    "grade": "A",
-    "issued_date": "2026-01-01",
-    "blockchain_tx_hash": "0x123...",
-    "blockchain_receipt": {
-      "transactionHash": "0x123...",
-      "blockNumber": 12345,
-      "gasUsed": "150000"
-    }
+    "blockchain_tx_hash": "0x123..."
   }
 }
 ```
 
-**Errors:**
-- `400`: Missing required fields
-- `404`: Student not found
-- `500`: Blockchain transaction failed
-- `500`: Database error
-
 ---
 
-### 6. Get Certificate Signature Payload
+### 6. Bulk Issue Certificates
+**POST** `/api/university/certificates/bulk`  
+**Auth:** Required
 
-**POST** `/api/university/certificate/sign-payload`
-
-Get payload for MetaMask signing before issuing certificate.
-
-**Headers:**
-```http
-Authorization: Bearer <university_token>
-```
-
-**Request Body:**
-```json
-{
-  "student_id": "STU123456789",
-  "course_name": "Blockchain Fundamentals",
-  "grade": "A"
-}
-```
-
-**Response (200):**
-```json
-{
-  "success": true,
-  "certificate_id": "CERT123",
-  "payload": {
-    "certificateId": "CERT123",
-    "studentName": "John Doe",
-    "courseName": "Blockchain Fundamentals",
-    "issueDate": "2026-01-01",
-    "issuerName": "Tech University"
-  },
-  "message": "Sign this message with MetaMask to authorize certificate issuance"
-}
-```
-
----
-
-### 7. Issue Certificate with Signature
-
-**POST** `/api/university/certificate/issue-signed`
-
-Issue certificate using pre-signed MetaMask signature.
-
-**Headers:**
-```http
-Authorization: Bearer <university_token>
-```
-
-**Request Body:**
-```json
-{
-  "certificate_id": "CERT123",
-  "student_id": "STU123456789",
-  "course_name": "Blockchain Fundamentals",
-  "grade": "A",
-  "signature": "0x123abc..." 
-}
-```
-
-**Response (200):**
-```json
-{
-  "success": true,
-  "message": "Certificate issued with signature",
-  "certificate_id": "CERT123",
-  "blockchain_tx_hash": "0x456def..."
-}
-```
-
----
-
-### 8. Get Bulk Authorization Message
-
-**POST** `/api/university/certificate/bulk-auth`
-
-Get authorization message for bulk certificate issuance.
-
-**Headers:**
-```http
-Authorization: Bearer <university_token>
-```
-
-**Request Body:**
 ```json
 {
   "certificates": [
@@ -622,177 +416,39 @@ Authorization: Bearer <university_token>
 ```json
 {
   "success": true,
-  "authMessage": "Authorize bulk issuance of 2 certificates",
-  "certificateIds": ["CERT123", "CERT124"],
-  "certificates": [
-    {
-      "certificate_id": "CERT123",
-      "student_id": "STU111",
-      "course_name": "Course A",
-      "grade": "A"
-    },
-    {
-      "certificate_id": "CERT124",
-      "student_id": "STU222",
-      "course_name": "Course B",
-      "grade": "B"
-    }
-  ]
-}
-```
-
----
-
-### 9. Bulk Issue with Single Signature
-
-**POST** `/api/university/certificate/bulk-issue-signed`
-
-Issue multiple certificates with one MetaMask signature.
-
-**Headers:**
-```http
-Authorization: Bearer <university_token>
-```
-
-**Request Body:**
-```json
-{
-  "signature": "0x123abc...",
-  "certificates": [
-    {
-      "certificate_id": "CERT123",
-      "student_id": "STU111",
-      "course_name": "Course A",
-      "grade": "A"
-    },
-    {
-      "certificate_id": "CERT124",
-      "student_id": "STU222",
-      "course_name": "Course B",
-      "grade": "B"
-    }
-  ]
-}
-```
-
-**Response (200):**
-```json
-{
-  "success": true,
-  "message": "Bulk issuance completed",
+  "successCount": 2,
+  "failureCount": 0,
   "results": [
     {
+      "student_id": "STU111",
       "certificate_id": "CERT123",
-      "success": true,
-      "tx_hash": "0x456def..."
-    },
-    {
-      "certificate_id": "CERT124",
-      "success": true,
-      "tx_hash": "0x789ghi..."
+      "success": true
     }
-  ],
-  "successCount": 2,
-  "failureCount": 0
+  ]
 }
 ```
 
 ---
 
-### 10. Get All University Certificates
-
-**GET** `/api/university/certificates`
-
-Get all certificates issued by this university.
-
-**Headers:**
-```http
-Authorization: Bearer <university_token>
-```
+### 7. Get University Certificates
+**GET** `/api/university/certificates`  
+**Auth:** Required
 
 **Response (200):**
 ```json
 {
   "total": 150,
-  "certificates": [
-    {
-      "certificate_id": "CERT123",
-      "user_id": "STU123456789",
-      "student_name": "John Doe",
-      "course": "Blockchain Fundamentals",
-      "issued_date": "2026-01-01",
-      "grade": "A",
-      "blockchain_tx_hash": "0x123..."
-    }
-  ]
+  "certificates": [{...}]
 }
 ```
 
 ---
 
-### 11. Bulk Issue Certificates (CSV Upload)
+## 🔐 Admin API
 
-**POST** `/api/university/certificates/bulk`
-
-Issue multiple certificates from CSV data.
-
-**Headers:**
-```http
-Authorization: Bearer <university_token>
-Content-Type: application/json
-```
-
-**Request Body:**
-```json
-{
-  "certificates": [
-    {
-      "student_id": "STU111",
-      "course_name": "Course A",
-      "grade": "A"
-    },
-    {
-      "student_id": "STU222",
-      "course_name": "Course B",
-      "grade": "B"
-    }
-  ]
-}
-```
-
-**Response (200):**
-```json
-{
-  "success": true,
-  "message": "Bulk issuance completed",
-  "results": [
-    {
-      "student_id": "STU111",
-      "certificate_id": "CERT123",
-      "success": true
-    },
-    {
-      "student_id": "STU222",
-      "certificate_id": "CERT124",
-      "success": true
-    }
-  ],
-  "successCount": 2,
-  "failureCount": 0
-}
-```
-
----
-
-## Admin API
-
-### 1. Admin Login
-
+### 1. Login
 **POST** `/api/admin/login`
 
-Authenticate an admin user.
-
-**Request Body:**
 ```json
 {
   "username": "admin",
@@ -803,8 +459,8 @@ Authenticate an admin user.
 **Response (200):**
 ```json
 {
-  "message": "Login successful",
-  "token": "eyJhbGciOiJIUzI1NiIs...",
+  "success": true,
+  "token": "eyJhbGc...",
   "admin": {
     "admin_id": "ADMIN001",
     "username": "admin"
@@ -812,47 +468,17 @@ Authenticate an admin user.
 }
 ```
 
-**Errors:**
-- `400`: Missing username or password
-- `401`: Invalid credentials
-- `500`: Server error
+---
+
+### 2. Get Profile
+**GET** `/api/admin/profile`  
+**Auth:** Required
 
 ---
 
-### 2. Get Admin Profile
-
-**GET** `/api/admin/profile`
-
-Get current authenticated admin's profile.
-
-**Headers:**
-```http
-Authorization: Bearer <admin_token>
-```
-
-**Response (200):**
-```json
-{
-  "admin": {
-    "admin_id": "ADMIN001",
-    "username": "admin",
-    "created_at": "2026-01-01T00:00:00.000Z"
-  }
-}
-```
-
----
-
-### 3. Get Admin Dashboard
-
-**GET** `/api/admin/dashboard`
-
-Get dashboard statistics and pending approvals.
-
-**Headers:**
-```http
-Authorization: Bearer <admin_token>
-```
+### 3. Get Dashboard
+**GET** `/api/admin/dashboard`  
+**Auth:** Required
 
 **Response (200):**
 ```json
@@ -862,133 +488,33 @@ Authorization: Bearer <admin_token>
     "totalInstitutes": 25,
     "totalCertificates": 1200,
     "approvedInstitutes": 20,
-    "pendingInstitutes": 3,
-    "rejectedInstitutes": 2
+    "pendingInstitutes": 3
   },
-  "pendingInstitutes": [
-    {
-      "institute_id": "UNI456",
-      "institute_name": "Tech University",
-      "email": "admin@techuni.edu",
-      "wallet_address": "0x742d35Cc...",
-      "verification_status": "pending",
-      "logo_url": "/uploads/institutes/logos/logo-123.png",
-      "verification_doc_url": "/uploads/institutes/documents/doc-123.pdf",
-      "created_at": "2026-01-01T00:00:00.000Z"
-    }
-  ],
-  "totalPending": 3
+  "pendingInstitutes": [...]
 }
 ```
 
 ---
 
 ### 4. Get All Institutes
-
-**GET** `/api/admin/institutes`
-
-Get all registered institutes (all statuses).
-
-**Headers:**
-```http
-Authorization: Bearer <admin_token>
-```
-
-**Response (200):**
-```json
-{
-  "total": 25,
-  "institutes": [
-    {
-      "institute_id": "UNI456",
-      "institute_name": "Tech University",
-      "email": "admin@techuni.edu",
-      "wallet_address": "0x742d35Cc...",
-      "verification_status": "approved",
-      "logo_url": "/uploads/institutes/logos/logo-123.png",
-      "created_at": "2026-01-01T00:00:00.000Z"
-    }
-  ]
-}
-```
+**GET** `/api/admin/institutes`  
+**Auth:** Required
 
 ---
 
 ### 5. Get Pending Institutes
-
-**GET** `/api/admin/institutes/pending`
-
-Get only institutes awaiting approval.
-
-**Headers:**
-```http
-Authorization: Bearer <admin_token>
-```
-
-**Response (200):**
-```json
-{
-  "total": 3,
-  "institutes": [
-    {
-      "institute_id": "UNI456",
-      "institute_name": "Tech University",
-      "email": "admin@techuni.edu",
-      "wallet_address": "0x742d35Cc...",
-      "verification_status": "pending",
-      "verification_doc_url": "/uploads/institutes/documents/doc-123.pdf",
-      "created_at": "2026-01-01T00:00:00.000Z"
-    }
-  ]
-}
-```
+**GET** `/api/admin/institutes/pending`  
+**Auth:** Required
 
 ---
 
-### 6. Get Issuer Status (Blockchain)
+### 6. Approve Institute
+**POST** `/api/admin/institutes/:institute_id/approve`  
+**Auth:** Required
 
-**GET** `/api/admin/institutes/:institute_id/issuer-status`
-
-Check if an institute is authorized as an issuer on the blockchain.
-
-**Parameters:**
-- `institute_id` (path): The institute ID
-
-**Headers:**
-```http
-Authorization: Bearer <admin_token>
-```
-
-**Response (200):**
 ```json
 {
-  "institute_id": "UNI456",
-  "wallet_address": "0x742d35Cc...",
-  "isAuthorizedIssuer": true,
-  "blockchainStatus": "authorized"
-}
-```
-
----
-
-### 7. Approve Institute
-
-**POST** `/api/admin/institutes/:institute_id/approve`
-
-Approve a pending institute and authorize on blockchain.
-
-**Parameters:**
-- `institute_id` (path): The institute ID
-
-**Headers:**
-```http
-Authorization: Bearer <admin_token>
-```
-
-**Request Body:** (optional)
-```json
-{
-  "notes": "Approved after document verification"
+  "notes": "Approved after verification"
 }
 ```
 
@@ -997,11 +523,6 @@ Authorization: Bearer <admin_token>
 {
   "success": true,
   "message": "Institute approved and authorized on blockchain",
-  "institute": {
-    "institute_id": "UNI456",
-    "institute_name": "Tech University",
-    "verification_status": "approved"
-  },
   "blockchain": {
     "authorized": true,
     "tx_hash": "0x123..."
@@ -1009,150 +530,30 @@ Authorization: Bearer <admin_token>
 }
 ```
 
-**Errors:**
-- `404`: Institute not found
-- `400`: Institute not in pending status
-- `500`: Blockchain authorization failed
-
 ---
 
-### 8. Reject Institute
+### 7. Reject Institute
+**POST** `/api/admin/institutes/:institute_id/reject`  
+**Auth:** Required
 
-**POST** `/api/admin/institutes/:institute_id/reject`
-
-Reject a pending institute application.
-
-**Parameters:**
-- `institute_id` (path): The institute ID
-
-**Headers:**
-```http
-Authorization: Bearer <admin_token>
-```
-
-**Request Body:** (optional)
 ```json
 {
-  "reason": "Invalid verification documents"
-}
-```
-
-**Response (200):**
-```json
-{
-  "success": true,
-  "message": "Institute rejected",
-  "institute": {
-    "institute_id": "UNI456",
-    "institute_name": "Tech University",
-    "verification_status": "rejected"
-  }
+  "reason": "Invalid documents"
 }
 ```
 
 ---
 
-### 9. Revoke Institute Authorization
-
-**POST** `/api/admin/institutes/:institute_id/revoke`
-
-Revoke an approved institute's authorization on blockchain.
-
-**Parameters:**
-- `institute_id` (path): The institute ID
-
-**Headers:**
-```http
-Authorization: Bearer <admin_token>
-```
-
-**Request Body:** (optional)
-```json
-{
-  "reason": "Violations of terms of service"
-}
-```
-
-**Response (200):**
-```json
-{
-  "success": true,
-  "message": "Institute authorization revoked on blockchain",
-  "institute": {
-    "institute_id": "UNI456",
-    "institute_name": "Tech University",
-    "verification_status": "rejected"
-  },
-  "blockchain": {
-    "revoked": true,
-    "tx_hash": "0x456..."
-  }
-}
-```
+### 8. Get Statistics
+**GET** `/api/admin/statistics`  
+**Auth:** Required
 
 ---
 
-### 10. Get Statistics
+## 🔓 Public Verify API (No Auth Required)
 
-**GET** `/api/admin/statistics`
-
-Get system-wide statistics.
-
-**Headers:**
-```http
-Authorization: Bearer <admin_token>
-```
-
-**Response (200):**
-```json
-{
-  "totalStudents": 500,
-  "totalInstitutes": 25,
-  "totalCertificates": 1200,
-  "approvedInstitutes": 20,
-  "pendingInstitutes": 3,
-  "rejectedInstitutes": 2,
-  "certificatesIssuedToday": 15,
-  "certificatesIssuedThisMonth": 350
-}
-```
-
----
-
-### 11. Get Blockchain Status
-
-**GET** `/api/admin/blockchain/status`
-
-Get blockchain connection and contract status.
-
-**Headers:**
-```http
-Authorization: Bearer <admin_token>
-```
-
-**Response (200):**
-```json
-{
-  "connected": true,
-  "network": "Polygon Amoy Testnet",
-  "contractAddress": "0x13660206fF34b48b07422a6658BfD93242b6a126",
-  "blockNumber": 12345678,
-  "gasPrice": "30000000000"
-}
-```
-
----
-
-## Public Verify API
-
-### 1. Verify Certificate by ID
-
+### 1. Verify by Certificate ID
 **GET** `/api/verify/certificate/:certificateId`
-
-Verify a certificate using its certificate ID (public endpoint, no auth).
-
-**Parameters:**
-- `certificateId` (path): The certificate ID (e.g., CERT123)
 
 **Response (200):**
 ```json
@@ -1160,52 +561,23 @@ Verify a certificate using its certificate ID (public endpoint, no auth).
   "success": true,
   "certificate": {
     "certificate_id": "CERT123",
-    "user_id": "STU123456789",
     "student_name": "John Doe",
-    "student_email": "john@example.com",
-    "institute_id": "UNI456",
-    "institute_name": "Tech University",
-    "issuer_wallet": "0x742d35Cc...",
-    "logo_url": "/uploads/institutes/logos/logo-123.png",
-    "certificate_title": "Blockchain Certification",
     "course": "Blockchain Fundamentals",
+    "institute_name": "Tech University",
     "issued_date": "2026-01-01",
-    "expiry_date": null,
-    "grade": "A",
-    "blockchain_tx_hash": "0x123..."
+    "grade": "A"
   },
   "onchain": {
-    "checked": true,
     "verified": true,
-    "data": {
-      "certificateId": "CERT123",
-      "studentName": "John Doe",
-      "courseName": "Blockchain Fundamentals",
-      "issueDate": "2026-01-01",
-      "issuerName": "Tech University"
-    },
-    "comparison": {
-      "match": true
-    }
+    "match": true
   }
 }
 ```
 
-**Errors:**
-- `400`: Missing certificateId
-- `404`: Certificate not found
-- `500`: Server error
-
 ---
 
-### 2. Get Certificates by User ID
-
+### 2. Get Student Certificates
 **GET** `/api/verify/user/:userId`
-
-Get all certificates for a student using their user ID (public endpoint, no auth).
-
-**Parameters:**
-- `userId` (path): The student user ID (e.g., STU123456789)
 
 **Response (200):**
 ```json
@@ -1214,70 +586,150 @@ Get all certificates for a student using their user ID (public endpoint, no auth
   "student": {
     "user_id": "STU123456789",
     "full_name": "John Doe",
-    "email": "john@example.com",
-    "gender": "Male",
-    "birthdate": "2000-01-15"
+    "email": "john@example.com"
   },
-  "certificates": [
-    {
-      "certificate_id": "CERT123",
-      "user_id": "STU123456789",
-      "institute_id": "UNI456",
-      "institute_name": "Tech University",
-      "issuer_wallet": "0x742d35Cc...",
-      "logo_url": "/uploads/institutes/logos/logo-123.png",
-      "certificate_title": "Blockchain Certification",
-      "course": "Blockchain Fundamentals",
-      "issued_date": "2026-01-01",
-      "grade": "A",
-      "blockchain_tx_hash": "0x123..."
-    }
-  ]
+  "certificates": [...]
 }
 ```
 
+---
+
+## 🤖 AI Career Insights (NEW) ⭐
+
+### Get Career Analysis
+**POST** `/api/student/career-insights`  
+**Auth:** Required  
+**Requires:** GEMINI_API_KEY in .env
+
+**Request:**
+```json
+{
+  "regenerate": false
+}
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "insights": {
+    "careerMatches": [
+      {
+        "title": "Junior UI/UX Designer",
+        "matchPercentage": 85
+      },
+      {
+        "title": "Graphic Designer",
+        "matchPercentage": 82
+      }
+    ],
+    "topSkills": [
+      "UI/UX Design Principles",
+      "Adobe Illustrator (Advanced)",
+      "Prototyping & Wireframing"
+    ],
+    "nextSteps": [
+      {
+        "step": "Step 1: Portfolio Construction",
+        "title": "Build Comprehensive Portfolio",
+        "description": "Develop 3-4 case studies showing your design thinking...",
+        "completed": false
+      },
+      {
+        "step": "Step 2: Master Industry Tools",
+        "title": "Learn Figma",
+        "description": "Complete advanced Figma courses...",
+        "completed": false
+      }
+    ],
+    "summary": "Based on your certificates in UI/UX Design, Digital Design, and Web Development, you demonstrate strong potential for design roles. With your technical background and design skills, you're well-prepared for entry-level positions at tech companies...",
+    "generatedAt": "2026-02-05T10:30:00Z"
+  }
+}
+```
+
+**Features:**
+- ✅ Uses Google Gemini 1.5 Pro AI
+- ✅ Smart caching (returns cached unless regenerate=true)
+- ✅ Analyzes certificates, courses, grades
+- ✅ Generates realistic career matches (60-95%)
+- ✅ Identifies relevant skills (5-7)
+- ✅ Creates actionable next steps (4-5)
+- ✅ Professional career summary
+
 **Errors:**
-- `400`: Missing userId
+- `400`: Student has no certificates
+- `401`: Invalid token
 - `404`: Student not found
-- `500`: Server error
+- `500`: GEMINI_API_KEY not configured
 
 ---
 
-## File Upload
+## 📊 Data Models
 
-### University Logo and Document Upload
-
-When registering a university, files are uploaded using `multipart/form-data`.
-
-**Accepted Files:**
-- `logo`: Image files (PNG, JPG, JPEG) - max 5MB
-- `verification_doc`: PDF or document files - max 10MB
-
-**File URLs:**
-- Logos: `/uploads/institutes/logos/logo-{timestamp}-{random}.{ext}`
-- Documents: `/uploads/institutes/documents/doc-{timestamp}-{random}.{ext}`
-
-**Accessing Files:**
-
-**Public (Logo):**
-```
-http://localhost:3001/uploads/institutes/logos/logo-123.png
+### Student
+```json
+{
+  "user_id": "STU123456789",
+  "full_name": "String",
+  "email": "String (unique)",
+  "password_hash": "String (bcrypt)",
+  "gender": "Male|Female|Other",
+  "birthdate": "YYYY-MM-DD",
+  "created_at": "Timestamp",
+  "updated_at": "Timestamp"
+}
 ```
 
-**Protected (Documents):**
+### Institute
+```json
+{
+  "institute_id": "UNI123456789",
+  "institute_name": "String",
+  "email": "String (unique)",
+  "password_hash": "String (bcrypt)",
+  "wallet_address": "0x... (42 chars, unique)",
+  "verification_status": "pending|approved|rejected",
+  "logo_url": "String or null",
+  "verification_doc_url": "String or null",
+  "created_at": "Timestamp",
+  "updated_at": "Timestamp"
+}
 ```
-http://localhost:3001/api/files/doc-123.pdf
-Authorization: Bearer <token>
+
+### Certificate
+```json
+{
+  "certificate_id": "CERT123456789",
+  "user_id": "STU123456789",
+  "institute_id": "UNI123456789",
+  "certificate_title": "String",
+  "course": "String",
+  "issued_date": "YYYY-MM-DD",
+  "expiry_date": "YYYY-MM-DD or null",
+  "grade": "String",
+  "blockchain_tx_hash": "0x... or null",
+  "blockchain_verified": "Boolean",
+  "created_at": "Timestamp"
+}
+```
+
+### Admin
+```json
+{
+  "admin_id": "ADMIN001",
+  "username": "String (unique)",
+  "password_hash": "String (bcrypt)",
+  "email": "String (unique)",
+  "created_at": "Timestamp"
+}
 ```
 
 ---
 
-## Error Handling
+## ❌ Error Handling
 
-### Standard Error Response Format
-
-All errors return JSON with consistent structure:
-
+### Standard Error Response
 ```json
 {
   "error": "Error message description"
@@ -1285,176 +737,40 @@ All errors return JSON with consistent structure:
 ```
 
 ### HTTP Status Codes
-
 - `200` - Success
-- `201` - Created (successful registration/creation)
-- `400` - Bad Request (validation errors, missing fields)
-- `401` - Unauthorized (invalid credentials, expired token)
-- `403` - Forbidden (no token, wrong role, not approved)
-- `404` - Not Found (resource doesn't exist)
+- `201` - Created
+- `400` - Bad Request (validation errors)
+- `401` - Unauthorized (invalid credentials or token)
+- `403` - Forbidden (no token or wrong role)
+- `404` - Not Found
 - `409` - Conflict (duplicate email/wallet)
-- `500` - Internal Server Error
+- `500` - Server Error
 
-### Common Error Messages
-
-**Authentication:**
-- `"No token provided"` - Missing Authorization header
-- `"Invalid or expired token"` - JWT verification failed
-- `"Access denied. Students only."` - Wrong role for endpoint
-- `"Invalid credentials"` - Wrong email/password
-
-**Validation:**
-- `"All fields are required"` - Missing required fields
-- `"Invalid email format"` - Email validation failed
-- `"Password must be at least 6 characters"` - Password too short
-- `"Invalid wallet address format"` - Wallet not 0x + 40 hex chars
-
-**Resource:**
-- `"Student not found"` - Student ID doesn't exist
-- `"Certificate not found"` - Certificate ID doesn't exist
-- `"Institute not found"` - Institute ID doesn't exist
-
-**Business Logic:**
-- `"Email already registered"` - Duplicate email
-- `"Wallet already registered"` - Duplicate wallet
-- `"Institute not approved. Status: pending"` - Login before approval
+### Common Errors
+| Error | Fix |
+|-------|-----|
+| `"No token provided"` | Add Authorization header with JWT |
+| `"Invalid or expired token"` | Login again to get new token |
+| `"All fields are required"` | Check all required fields in request |
+| `"Invalid email format"` | Use valid email address |
+| `"Email already registered"` | Use different email |
+| `"Institute not approved"` | Wait for admin approval |
+| `"Certificate not found"` | Check certificate ID |
 
 ---
 
-## Data Models
+## 🎨 Frontend Integration
 
-### Student
-```typescript
-{
-  user_id: string;           // Auto-generated: "STU" + timestamp + random
-  full_name: string;
-  email: string;             // Unique
-  password_hash: string;     // bcrypt hashed
-  gender: "Male" | "Female" | "Other";
-  birthdate: string;         // YYYY-MM-DD
-  created_at: Date;
-  updated_at: Date;
-}
-```
-
-### Institute (University)
-```typescript
-{
-  institute_id: string;      // Auto-generated: "UNI" + timestamp + random
-  institute_name: string;
-  email: string;             // Unique
-  password_hash: string;     // bcrypt hashed
-  wallet_address: string;    // Unique, 0x + 40 hex chars
-  verification_status: "pending" | "approved" | "rejected";
-  logo_url: string | null;
-  verification_doc_url: string | null;
-  created_at: Date;
-  updated_at: Date;
-}
-```
-
-### Certificate
-```typescript
-{
-  certificate_id: string;    // Auto-generated: "CERT" + timestamp + random
-  user_id: string;           // FK to students.user_id
-  institute_id: string;      // FK to institutes.institute_id
-  certificate_title: string;
-  course: string;
-  issued_date: string;       // YYYY-MM-DD
-  expiry_date: string | null;
-  grade: string;
-  blockchain_tx_hash: string | null;
-  blockchain_verified: boolean;
-  created_at: Date;
-}
-```
-
-### Admin
-```typescript
-{
-  admin_id: string;          // e.g., "ADMIN001"
-  username: string;          // Unique
-  password_hash: string;     // bcrypt hashed
-  email: string;             // Unique
-  created_at: Date;
-}
-```
-
----
-
-## CORS Configuration
-
-CORS is **enabled for all origins** in development. For production, configure specific origins:
+### React Example - Login & Get Dashboard
 
 ```javascript
-// Current (Development)
-app.use(cors()); // All origins allowed
-
-// Production (Recommended)
-app.use(cors({
-  origin: 'https://your-frontend-domain.com',
-  credentials: true
-}));
-```
-
----
-
-## Rate Limiting
-
-Currently **no rate limiting** is implemented. For production, add:
-
-```javascript
-const rateLimit = require('express-rate-limit');
-
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100 // limit each IP to 100 requests per windowMs
-});
-
-app.use('/api/', limiter);
-```
-
----
-
-## Environment Variables
-
-Required `.env` configuration:
-
-```env
-# Server
-PORT=3001
-
-# Database
-DB_HOST=localhost
-DB_USER=root
-DB_PASSWORD=your_password
-DB_NAME=cert_verification_system
-
-# JWT
-JWT_SECRET=your_super_secret_key_change_in_production
-
-# Blockchain
-RPC_URL=https://rpc-amoy.polygon.technology
-CONTRACT_ADDRESS=0x13660206fF34b48b07422a6658BfD93242b6a126
-PRIVATE_KEY=your_private_key_for_blockchain_transactions
-```
-
----
-
-## Quick Start Example (React)
-
-### Setup Axios Client
-
-```javascript
-// src/api/client.js
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:3001/api',
+  baseURL: 'http://localhost:3001/api'
 });
 
-// Auto-attach JWT token
+// Add token to requests
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
   if (token) {
@@ -1463,109 +779,144 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-export default api;
-```
-
-### Student Login
-
-```javascript
-import api from './api/client';
-
+// Login
 async function loginStudent(email, password) {
-  try {
-    const response = await api.post('/auth/student/login', {
-      email,
-      password
-    });
-    
-    // Store token
-    localStorage.setItem('token', response.data.token);
-    localStorage.setItem('user', JSON.stringify(response.data.student));
-    
-    return response.data;
-  } catch (error) {
-    console.error('Login failed:', error.response?.data?.error);
-    throw error;
-  }
+  const response = await api.post('/auth/student/login', {
+    email,
+    password
+  });
+  localStorage.setItem('token', response.data.token);
+  return response.data;
+}
+
+// Get Dashboard
+async function getDashboard() {
+  const response = await api.get('/student/dashboard');
+  return response.data;
+}
+
+// Get Career Insights (AI)
+async function getCareerInsights() {
+  const response = await api.post('/student/career-insights', {
+    regenerate: false
+  });
+  return response.data.insights;
 }
 ```
 
-### Get Student Certificates
+### JavaScript Fetch Example
 
 ```javascript
-import api from './api/client';
+// Login
+const loginResponse = await fetch('http://localhost:3001/api/auth/student/login', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    email: 'john@example.com',
+    password: 'password123'
+  })
+});
 
-async function getCertificates() {
-  try {
-    const response = await api.get('/student/certificates');
-    return response.data.certificates;
-  } catch (error) {
-    console.error('Failed to fetch certificates:', error.response?.data?.error);
-    throw error;
-  }
-}
+const { token } = await loginResponse.json();
+localStorage.setItem('token', token);
+
+// Get Dashboard
+const dashResponse = await fetch('http://localhost:3001/api/student/dashboard', {
+  headers: { 'Authorization': `Bearer ${token}` }
+});
+
+const dashboard = await dashResponse.json();
+console.log(dashboard);
 ```
 
-### University Registration with File Upload
+---
 
-```javascript
-import api from './api/client';
+## 📁 Project Structure
 
-async function registerUniversity(data, logoFile, docFile) {
-  try {
-    const formData = new FormData();
-    formData.append('institute_name', data.institute_name);
-    formData.append('email', data.email);
-    formData.append('password', data.password);
-    formData.append('wallet_address', data.wallet_address);
-    
-    if (logoFile) formData.append('logo', logoFile);
-    if (docFile) formData.append('verification_doc', docFile);
-    
-    const response = await api.post('/university/register', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    });
-    
-    localStorage.setItem('token', response.data.token);
-    return response.data;
-  } catch (error) {
-    console.error('Registration failed:', error.response?.data?.error);
-    throw error;
-  }
-}
+```
+cert-system/
+├── config/           # Database configuration
+├── controllers/      # Route controllers
+│   ├── studentController.js     (Student endpoints + AI Career Insights)
+│   ├── universityController.js  (University endpoints)
+│   ├── adminController.js       (Admin endpoints)
+│   └── authController.js        (Authentication)
+├── routes/          # Route definitions
+│   ├── student.js
+│   ├── university.js
+│   ├── admin.js
+│   └── auth.js
+├── models/          # Data models
+│   ├── Student.js
+│   ├── Institute.js
+│   └── Admin.js
+├── middleware/      # Middleware (auth, upload, etc)
+├── database/        # Database schemas
+├── utils/           # Utilities (blockchain, etc)
+├── public/          # Static files & uploads
+├── .env             # Environment configuration
+├── package.json     # Dependencies
+└── server.js        # Main server file
 ```
 
-### Public Certificate Verification
+---
 
-```javascript
-import axios from 'axios';
+## 🔧 Dependencies
 
-async function verifyCertificate(certificateId) {
-  try {
-    const response = await axios.get(
-      `http://localhost:3001/api/verify/certificate/${certificateId}`
-    );
-    return response.data;
-  } catch (error) {
-    console.error('Verification failed:', error.response?.data?.error);
-    throw error;
-  }
+```json
+{
+  "@google/generative-ai": "^0.1.3",  // Gemini AI for Career Insights
+  "express": "^5.2.1",
+  "mysql2": "^3.7.0",
+  "bcrypt": "^5.1.1",
+  "jsonwebtoken": "^9.0.2",
+  "dotenv": "^17.2.3",
+  "multer": "^2.0.2",
+  "cors": "^2.8.5",
+  "ethers": "^5.8.0"
 }
 ```
 
 ---
 
-## Support
+## 🚀 Deployment
 
-For questions or issues:
-- Check error messages in API responses
-- Verify JWT token is not expired
-- Ensure all required fields are provided
-- Check user role matches endpoint requirements
-- Verify institute is approved before login (universities)
+### Production Checklist
+- [ ] Change JWT_SECRET to strong random string
+- [ ] Add GEMINI_API_KEY from Google AI Studio
+- [ ] Configure DATABASE credentials
+- [ ] Set NODE_ENV=production
+- [ ] Use HTTPS only
+- [ ] Configure CORS for your frontend domain
+- [ ] Set strong blockchain PRIVATE_KEY
+- [ ] Enable rate limiting
+- [ ] Setup error logging
+- [ ] Backup database regularly
+
+### Environment for Production
+```dotenv
+NODE_ENV=production
+PORT=3001
+DB_HOST=your-db-host
+DB_USER=your-db-user
+DB_PASSWORD=your-secure-password
+JWT_SECRET=your-super-long-random-string-min-32-chars
+GEMINI_API_KEY=your-gemini-key
+```
 
 ---
 
-**End of API Documentation**
+## 📞 Support
+
+For issues or questions:
+1. Check error messages in response
+2. Verify all required fields are provided
+3. Ensure JWT token is valid (not expired)
+4. Check database connectivity
+5. Review console logs on server
+
+---
+
+**Status:** ✅ Production Ready  
+**Version:** 2.0  
+**Last Updated:** February 5, 2026
