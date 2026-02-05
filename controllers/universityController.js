@@ -630,46 +630,65 @@ exports.bulkIssueWithSingleSignature = async (req, res) => {
     for (let i = 0; i < certificates.length; i++) {
       const cert = certificates[i];
       const {
+        certId,
         certificate_id,
-        student_id,
+        studentName,
+        student_name,
+        courseName,
         course_name,
         grade,
+        issueDate,
         issued_date,
-        student_name // optional; if missing we fetch by student_id
+        issuerName
       } = cert;
 
+      // Normalize field names to handle both camelCase and snake_case
+      const certId_normalized = certId || certificate_id;
+      let studentName_normalized = studentName || student_name;
+      const courseName_normalized = courseName || course_name;
+      const issueDate_normalized = issueDate || issued_date;
+      const issuerName_normalized = issuerName || instRows[0].institute_name || 'Unknown';
+
       // Validate required fields
-      if (!certificate_id || !course_name || !issued_date) {
-        results.push({ index: i, certificate_id, success: false, error: 'Missing required fields (certificate_id, course_name, issued_date)' });
+      if (!certId_normalized || !courseName_normalized || !issueDate_normalized) {
+        results.push({
+          certificate_id: certId_normalized,
+          student_id: cert.student_id,
+          success: false,
+          error: 'Missing required fields (certId/certificate_id, courseName/course_name, issueDate/issued_date)'
+        });
         continue;
       }
 
       try {
-        // Get student name - either from payload or database
-        let studentName = student_name;
-        if (!studentName && student_id) {
-          const [sRows] = await db.execute('SELECT full_name FROM students WHERE user_id = ?', [student_id]);
-          if (sRows.length === 0) {
-            results.push({ index: i, certificate_id, success: false, error: 'Student not found' });
-            continue;
+        console.log(`\n📋 Processing certificate ${i + 1}/${certificates.length}: ${certId_normalized}`);
+
+        // Get student name if not provided
+        if (!studentName_normalized && cert.student_id) {
+          console.log(`   🔍 Fetching student name for ${cert.student_id}...`);
+          const [sRows] = await db.execute('SELECT full_name FROM students WHERE user_id = ?', [cert.student_id]);
+          if (sRows.length > 0) {
+            studentName_normalized = sRows[0].full_name;
+            console.log(`   ✓ Found: ${studentName_normalized}`);
           }
-          studentName = sRows[0].full_name;
         }
-        
-        // If still no student name, use a placeholder
-        if (!studentName) {
-          studentName = 'Unknown Student';
+
+        if (!studentName_normalized) {
+          studentName_normalized = `Student_${cert.student_id || 'Unknown'}`;
         }
 
         const certData = {
-          certId: certificate_id,
-          studentName,
-          courseName: course_name,
-          issueDate: issued_date,
-          issuerName: instRows[0].institute_name || 'Unknown'
+          certId: certId_normalized,
+          studentName: studentName_normalized,
+          courseName: courseName_normalized,
+          issueDate: issueDate_normalized,
+          issuerName: issuerName_normalized
         };
 
-        // Relay using bulk auth (one signature reused)
+        console.log(`   📦 Certificate data prepared:`, JSON.stringify(certData));
+
+        // Step 1: Submit to blockchain via bulk auth
+        console.log(`   🔗 Submitting to blockchain...`);
         const txResult = await blockchain.issueWithBulkAuth(
           certData,
           auth_hash,
@@ -680,43 +699,85 @@ exports.bulkIssueWithSingleSignature = async (req, res) => {
           expiryNum
         );
 
-        // Persist
+        if (!txResult || !txResult.txHash) {
+          throw new Error('Blockchain submission failed: No transaction hash returned');
+        }
+
+        console.log(`   ✅ Blockchain submission successful!`);
+        console.log(`   TX Hash: ${txResult.txHash}`);
+        console.log(`   Block: ${txResult.blockNumber}`);
+        console.log(`   Gas Used: ${txResult.gasUsed}`);
+
+        // Step 2: Determine blockchain status based on receipt
+        const blockchainStatus = txResult.status === 1 ? 'confirmed' : 'submitted';
+        const blockchainTimestamp = new Date();
+
+        // Step 3: Store in database with blockchain data
         const insertQuery = `
           INSERT INTO certificates 
-          (certificate_id, user_id, institute_id, certificate_title, course, issued_date, grade, blockchain_tx_hash)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+          (certificate_id, user_id, institute_id, certificate_title, course, issued_date, grade, blockchain_tx_hash, blockchain_status, blockchain_timestamp)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          ON DUPLICATE KEY UPDATE 
+            blockchain_tx_hash = VALUES(blockchain_tx_hash),
+            blockchain_status = VALUES(blockchain_status),
+            blockchain_timestamp = VALUES(blockchain_timestamp)
         `;
 
+        console.log(`   💾 Storing in database...`);
         await db.execute(insertQuery, [
-          certificate_id ?? null,
-          student_id ?? null,
+          certId_normalized ?? null,
+          cert.student_id ?? null,
           req.user.institute_id ?? null,
-          course_name ?? null,
-          course_name ?? null,
-          issued_date ?? null,
+          courseName_normalized ?? null,
+          courseName_normalized ?? null,
+          issueDate_normalized ?? null,
           grade ?? null,
-          txResult.txHash ?? null
+          txResult.txHash,
+          blockchainStatus,
+          blockchainTimestamp
         ]);
 
+        console.log(`   ✓ Database updated successfully`);
+
+        // Step 4: Add to results
         results.push({
-          index: i,
-          certificate_id,
-          success: true,
-          transactionHash: txResult.txHash,
-          blockNumber: txResult.blockNumber,
-          gasUsed: txResult.gasUsed,
-          status: txResult.status
+          certificate_id: certId_normalized,
+          student_id: cert.student_id,
+          blockchain_tx_hash: txResult.txHash,
+          blockchain_status: blockchainStatus,
+          blockchain_block: txResult.blockNumber,
+          blockchain_gas_used: txResult.gasUsed,
+          success: true
         });
+
       } catch (err) {
-        results.push({ index: i, certificate_id, success: false, error: err.message });
+        console.error(`   ❌ Error processing certificate ${certId_normalized}:`, err.message);
+        console.error(`   Stack:`, err.stack);
+
+        results.push({
+          certificate_id: certId || certificate_id,
+          student_id: cert.student_id,
+          success: false,
+          error: err.message,
+          blockchain_status: 'failed'
+        });
       }
     }
 
+    console.log('\n========== BULK ISSUE COMPLETE ==========');
+    console.log(`✅ Processed ${certificates.length} certificates`);
+    console.log(`✅ Successful: ${results.filter(r => r.success).length}`);
+    console.log(`❌ Failed: ${results.filter(r => !r.success).length}`);
+
+    // Return response with transaction hashes
     res.json({
       success: true,
       total: certificates.length,
-      results
+      successful: results.filter(r => r.success).length,
+      failed: results.filter(r => !r.success).length,
+      results: results
     });
+
   } catch (error) {
     console.error('❌ Bulk issue (single sig) error:', error.message);
     console.error('Stack:', error.stack);

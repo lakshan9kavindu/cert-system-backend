@@ -39,6 +39,8 @@ CREATE TABLE IF NOT EXISTS certificates (
     expiry_date DATE NULL,
     grade VARCHAR(50) NULL,
     blockchain_tx_hash VARCHAR(66),
+    blockchain_status ENUM('pending', 'submitted', 'confirmed') DEFAULT 'pending',
+    blockchain_timestamp TIMESTAMP NULL,
     blockchain_verified BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES students(user_id) ON DELETE CASCADE,
