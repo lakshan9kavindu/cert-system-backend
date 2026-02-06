@@ -46,7 +46,8 @@ exports.getDashboard = async (req, res) => {
         full_name: student.full_name,
         email: student.email,
         gender: student.gender,
-        birthdate: student.birthdate
+        birthdate: student.birthdate,
+        isPortfolioPublic: student.is_portfolio_public
       },
       certificates: certificates,
       statistics: {
@@ -351,5 +352,33 @@ Requirements:
       error: 'Failed to generate career insights',
       details: error.message 
     });
+  }
+};
+
+// Update portfolio visibility
+exports.updatePortfolioVisibility = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const { isPublic } = req.body;
+
+    if (typeof isPublic !== 'boolean') {
+      return res.status(400).json({ error: 'isPublic must be a boolean value' });
+    }
+
+    const query = 'UPDATE students SET is_portfolio_public = ? WHERE user_id = ?';
+    const [result] = await db.execute(query, [isPublic, userId]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Student not found' });
+    }
+
+    res.json({
+      success: true,
+      message: 'Portfolio visibility updated',
+      isPublic: isPublic
+    });
+  } catch (error) {
+    console.error('Update portfolio visibility error:', error);
+    res.status(500).json({ error: 'Server error' });
   }
 };

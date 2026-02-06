@@ -53,9 +53,16 @@ exports.listByUserId = async (req, res) => {
     const { userId } = req.params;
     if (!userId) return res.status(400).json({ success: false, error: 'userId is required' });
 
-    const studentQuery = 'SELECT user_id, full_name, email, gender, birthdate FROM students WHERE user_id = ? LIMIT 1';
+    const studentQuery = 'SELECT user_id, full_name, email, gender, birthdate, is_portfolio_public FROM students WHERE user_id = ? LIMIT 1';
     const [stuRows] = await db.execute(studentQuery, [userId]);
     if (!stuRows.length) return res.status(404).json({ success: false, error: 'Student not found' });
+
+    const student = stuRows[0];
+
+    // Check portfolio visibility
+    if (!student.is_portfolio_public) {
+      return res.status(403).json({ success: false, error: 'This portfolio is private' });
+    }
 
     const certQuery = `
       SELECT 
@@ -99,7 +106,13 @@ exports.listByUserId = async (req, res) => {
 
     res.json({ 
       success: true, 
-      student: stuRows[0], 
+      student: {
+        user_id: student.user_id,
+        full_name: student.full_name,
+        email: student.email,
+        gender: student.gender,
+        birthdate: student.birthdate
+      },
       certificates: certRows,
       careerInsights 
     });

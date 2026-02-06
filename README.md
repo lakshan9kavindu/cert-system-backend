@@ -235,7 +235,8 @@ Authorization: Bearer <token>
   "student": {
     "userId": "STU123456789",
     "full_name": "John Doe",
-    "email": "john@example.com"
+    "email": "john@example.com",
+    "isPortfolioPublic": true
   },
   "certificates": [{...}],
   "statistics": {
@@ -316,6 +317,34 @@ Authorization: Bearer <token>
   "message": "✅ Certificate verified on blockchain!"
 }
 ```
+
+---
+
+### 8. Update Portfolio Visibility
+**PATCH** `/api/student/portfolio/visibility`  
+**Auth:** Required
+
+**Request:**
+```json
+{
+  "isPublic": true
+}
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Portfolio visibility updated",
+  "isPublic": true
+}
+```
+
+**Notes:**
+- Set `isPublic: true` to make portfolio public (visible at `/portfolio/:userId`)
+- Set `isPublic: false` to make portfolio private (returns 403 when accessed)
+- Default: `true` (portfolios are public by default)
+- Affects public endpoints: `/api/verify/user/:userId`
 
 ---
 
@@ -946,6 +975,11 @@ Authorization: Bearer <token>
 - This endpoint powers public portfolio pages (`/portfolio/:userId`)
 - No authentication required - perfect for sharing with employers
 - Career insights are professional recommendations, safe for public sharing
+
+**Privacy Control:**
+- Returns `403` with error message `"This portfolio is private"` if student has set `isPublic: false`
+- Students can toggle portfolio visibility using `/api/student/portfolio/visibility` endpoint
+- Default: Portfolios are public (`isPublic: true`)
 
 ---
 
