@@ -238,7 +238,10 @@ Authorization: Bearer <token>
     "email": "john@example.com",
     "gender": "Male",
     "birthdate": "2000-01-15",
-    "isPortfolioPublic": true
+    "isPortfolioPublic": true,
+    "profile_photo_url": "/uploads/students/photos/profile_photo-123.png",
+    "cv_url": "/uploads/students/cvs/cv-123.pdf",
+    "github_url": "https://github.com/johndoe"
   },
   "certificates": [{...}],
   "statistics": {
@@ -347,6 +350,42 @@ Authorization: Bearer <token>
 - Set `isPublic: false` to make portfolio private (returns 403 when accessed)
 - Default: `true` (portfolios are public by default)
 - Affects public endpoints: `/api/verify/user/:userId`
+
+---
+
+### 9. Update Profile (With Files)
+**PATCH** `/api/student/profile`  
+**Auth:** Required  
+**Content-Type:** `multipart/form-data`
+
+**Fields:**
+- `full_name`: String (optional)
+- `email`: String (optional)
+- `gender`: String (optional)
+- `birthdate`: YYYY-MM-DD (optional)
+- `github_url`: String (optional)
+- `profile_photo`: File (image, optional)
+- `cv`: File (PDF/DOC/DOCX, optional)
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Profile updated successfully",
+  "student": {
+    "userId": "STU123456789",
+    "full_name": "John Doe",
+    "github_url": "https://github.com/johndoe",
+    "profile_photo_url": "/uploads/students/photos/profile_photo-123.png",
+    "cv_url": "/uploads/students/cvs/cv-123.pdf"
+  }
+}
+```
+
+**Notes:**
+- Files are limited to 5MB each
+- Images only for `profile_photo`
+- PDF/DOC/DOCX for `cv`
 
 ---
 
@@ -952,9 +991,12 @@ Authorization: Bearer <token>
 {
   "success": true,
   "student": {
-    "user_id": "STU123456789",
-    "full_name": "John Doe",
-    "email": "john@example.com"
+    "userId": "STU123456789",
+    "fullName": "John Doe",
+    "email": "john@example.com",
+    "profilePhotoUrl": "/uploads/students/photos/profile_photo-123.png",
+    "cvUrl": "/uploads/students/cvs/cv-123.pdf",
+    "githubUrl": "https://github.com/johndoe"
   },
   "certificates": [...],
   "careerInsights": {
@@ -1165,7 +1207,10 @@ Once generated, career insights are automatically included in public portfolio e
   "password_hash": "String (bcrypt)",
   "gender": "Male|Female|Other",
   "birthdate": "YYYY-MM-DD",
-  "is_portfolio_public": "Boolean (default: false)",
+  "is_portfolio_public": "Boolean (default: true)",
+  "profile_photo_url": "String or null",
+  "cv_url": "String or null",
+  "github_url": "String or null",
   "created_at": "Timestamp",
   "updated_at": "Timestamp"
 }

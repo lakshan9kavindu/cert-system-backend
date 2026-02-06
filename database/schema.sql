@@ -12,6 +12,10 @@ CREATE TABLE IF NOT EXISTS students (
     password_hash VARCHAR(255) NOT NULL,
     gender ENUM('Male', 'Female', 'Other') NOT NULL,
     birthdate DATE NOT NULL,
+    is_portfolio_public BOOLEAN DEFAULT TRUE,
+    profile_photo_url VARCHAR(255),
+    cv_url VARCHAR(255),
+    github_url VARCHAR(500),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );

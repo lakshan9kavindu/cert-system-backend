@@ -33,7 +33,7 @@ const Student = {
 
   // Find student by user ID
   async findById(userId) {
-    const query = 'SELECT user_id, full_name, email, gender, birthdate, is_portfolio_public, created_at FROM students WHERE user_id = ?';
+    const query = 'SELECT user_id, full_name, email, gender, birthdate, is_portfolio_public, profile_photo_url, cv_url, github_url, created_at FROM students WHERE user_id = ?';
     const [rows] = await db.execute(query, [userId]);
     return rows[0];
   },

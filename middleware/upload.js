@@ -11,14 +11,22 @@ const ensureDir = (dir) => {
 
 const logoDir = path.join(__dirname, '..', 'public', 'uploads', 'institutes', 'logos');
 const docDir = path.join(__dirname, '..', 'public', 'uploads', 'institutes', 'documents');
+const studentPhotoDir = path.join(__dirname, '..', 'public', 'uploads', 'students', 'photos');
+const studentCvDir = path.join(__dirname, '..', 'public', 'uploads', 'students', 'cvs');
 
 ensureDir(logoDir);
 ensureDir(docDir);
+ensureDir(studentPhotoDir);
+ensureDir(studentCvDir);
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     // Route to appropriate folder based on field name
-    if (file.fieldname === 'logo') {
+    if (file.fieldname === 'profile_photo') {
+      cb(null, studentPhotoDir);
+    } else if (file.fieldname === 'cv') {
+      cb(null, studentCvDir);
+    } else if (file.fieldname === 'logo') {
       cb(null, logoDir);
     } else if (file.fieldname === 'verification_doc') {
       cb(null, docDir);
@@ -36,7 +44,13 @@ const storage = multer.diskStorage({
 // Allow common image types for logo, and pdf/image for verification doc
 const allowedMime = {
   logo: ['image/png', 'image/jpeg', 'image/jpg', 'image/webp', 'image/gif'],
-  verification_doc: ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg', 'image/webp']
+  verification_doc: ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg', 'image/webp'],
+  profile_photo: ['image/png', 'image/jpeg', 'image/jpg', 'image/webp', 'image/gif'],
+  cv: [
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+  ]
 };
 
 const fileFilter = (req, file, cb) => {

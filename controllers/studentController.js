@@ -47,7 +47,10 @@ exports.getDashboard = async (req, res) => {
         email: student.email,
         gender: student.gender,
         birthdate: student.birthdate,
-        isPortfolioPublic: student.is_portfolio_public
+        isPortfolioPublic: student.is_portfolio_public,
+        profile_photo_url: student.profile_photo_url,
+        cv_url: student.cv_url,
+        github_url: student.github_url
       },
       certificates: certificates,
       statistics: {
@@ -380,5 +383,53 @@ exports.updatePortfolioVisibility = async (req, res) => {
   } catch (error) {
     console.error('Update portfolio visibility error:', error);
     res.status(500).json({ error: 'Server error' });
+  }
+};
+
+// Update student profile (with optional file uploads)
+exports.updateProfile = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const { full_name, email, gender, birthdate, github_url } = req.body;
+
+    const updates = {};
+    if (typeof full_name !== 'undefined') updates.full_name = full_name;
+    if (typeof email !== 'undefined') updates.email = email;
+    if (typeof gender !== 'undefined') updates.gender = gender;
+    if (typeof birthdate !== 'undefined') updates.birthdate = birthdate;
+    if (typeof github_url !== 'undefined') updates.github_url = github_url;
+
+    if (req.files && req.files.profile_photo && req.files.profile_photo.length > 0) {
+      const photoFile = req.files.profile_photo[0];
+      updates.profile_photo_url = `/uploads/students/photos/${photoFile.filename}`;
+    }
+
+    if (req.files && req.files.cv && req.files.cv.length > 0) {
+      const cvFile = req.files.cv[0];
+      updates.cv_url = `/uploads/students/cvs/${cvFile.filename}`;
+    }
+
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).json({ error: 'No profile fields provided' });
+    }
+
+    const updateFields = Object.keys(updates).map(key => `${key} = ?`).join(', ');
+    const values = [...Object.values(updates), userId];
+
+    const query = `UPDATE students SET ${updateFields} WHERE user_id = ?`;
+    const [result] = await db.execute(query, values);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Student not found' });
+    }
+
+    res.json({
+      success: true,
+      message: 'Profile updated successfully',
+      student: { userId, ...updates }
+    });
+  } catch (error) {
+    console.error('Profile update error:', error);
+    res.status(500).json({ error: 'Failed to update profile' });
   }
 };

@@ -53,7 +53,7 @@ exports.listByUserId = async (req, res) => {
     const { userId } = req.params;
     if (!userId) return res.status(400).json({ success: false, error: 'userId is required' });
 
-    const studentQuery = 'SELECT user_id, full_name, email, gender, birthdate, is_portfolio_public FROM students WHERE user_id = ? LIMIT 1';
+    const studentQuery = 'SELECT user_id, full_name, email, gender, birthdate, is_portfolio_public, profile_photo_url, cv_url, github_url FROM students WHERE user_id = ? LIMIT 1';
     const [stuRows] = await db.execute(studentQuery, [userId]);
     if (!stuRows.length) return res.status(404).json({ success: false, error: 'Student not found' });
 
@@ -61,7 +61,7 @@ exports.listByUserId = async (req, res) => {
 
     // Check portfolio visibility
     if (!student.is_portfolio_public) {
-      return res.status(403).json({ success: false, error: 'This portfolio is private' });
+      return res.status(403).json({ error: 'This portfolio is private' });
     }
 
     const certQuery = `
@@ -107,11 +107,12 @@ exports.listByUserId = async (req, res) => {
     res.json({ 
       success: true, 
       student: {
-        user_id: student.user_id,
-        full_name: student.full_name,
+        userId: student.user_id,
+        fullName: student.full_name,
         email: student.email,
-        gender: student.gender,
-        birthdate: student.birthdate
+        profilePhotoUrl: student.profile_photo_url,
+        cvUrl: student.cv_url,
+        githubUrl: student.github_url
       },
       certificates: certRows,
       careerInsights 
