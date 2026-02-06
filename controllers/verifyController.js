@@ -71,7 +71,38 @@ exports.listByUserId = async (req, res) => {
 
     const [certRows] = await db.execute(certQuery, [userId]);
 
-    res.json({ success: true, student: stuRows[0], certificates: certRows });
+    // Fetch career insights if available
+    let careerInsights = null;
+    try {
+      const insightsQuery = `
+        SELECT career_suggestions, skills_identified, recommended_courses, summary, generated_at 
+        FROM career_paths 
+        WHERE user_id = ? 
+        ORDER BY generated_at DESC 
+        LIMIT 1
+      `;
+      const [insightsRows] = await db.execute(insightsQuery, [userId]);
+      
+      if (insightsRows.length > 0) {
+        const insights = insightsRows[0];
+        careerInsights = {
+          careerMatches: JSON.parse(insights.career_suggestions || '[]'),
+          topSkills: JSON.parse(insights.skills_identified || '[]'),
+          nextSteps: JSON.parse(insights.recommended_courses || '[]'),
+          summary: insights.summary,
+          generatedAt: insights.generated_at
+        };
+      }
+    } catch (err) {
+      console.log('No career insights available for user:', userId);
+    }
+
+    res.json({ 
+      success: true, 
+      student: stuRows[0], 
+      certificates: certRows,
+      careerInsights 
+    });
   } catch (error) {
     console.error('listByUserId error:', error);
     res.status(500).json({ success: false, error: 'Server error' });

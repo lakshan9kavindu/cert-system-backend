@@ -2,7 +2,7 @@
 
 **Version:** 2.0  
 **Status:** Production Ready  
-**Last Updated:** February 5, 2026  
+**Last Updated:** February 6, 2026  
 **Base URL:** `http://localhost:3001`
 
 ---
@@ -913,7 +913,7 @@ Authorization: Bearer <token>
 
 ---
 
-### 2. Get Student Certificates
+### 2. Get Student Certificates & Portfolio
 **GET** `/api/verify/user/:userId`
 
 **Response (200):**
@@ -925,9 +925,27 @@ Authorization: Bearer <token>
     "full_name": "John Doe",
     "email": "john@example.com"
   },
-  "certificates": [...]
+  "certificates": [...],
+  "careerInsights": {
+    "careerMatches": [
+      {
+        "title": "Junior Developer",
+        "matchPercentage": 85
+      }
+    ],
+    "topSkills": ["React", "Node.js", "JavaScript"],
+    "nextSteps": [...],
+    "summary": "Professional career summary based on certificates...",
+    "generatedAt": "2026-02-05T10:30:00Z"
+  }
 }
 ```
+
+**Notes:**
+- `careerInsights` will be `null` if student hasn't generated AI insights yet
+- This endpoint powers public portfolio pages (`/portfolio/:userId`)
+- No authentication required - perfect for sharing with employers
+- Career insights are professional recommendations, safe for public sharing
 
 ---
 
@@ -1087,6 +1105,10 @@ Authorization: Bearer <token>
 - ✅ Identifies relevant skills (5-7)
 - ✅ Creates actionable next steps (4-5)
 - ✅ Professional career summary
+- ✅ **Publicly accessible** via `/api/verify/user/:userId` (no auth needed)
+
+**Public Availability:**
+Once generated, career insights are automatically included in public portfolio endpoints, allowing students to share impressive AI-powered professional profiles with employers without requiring authentication.
 
 **Errors:**
 - `400`: Student has no certificates
