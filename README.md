@@ -2,7 +2,7 @@
 
 **Version:** 2.0  
 **Status:** Production Ready  
-**Last Updated:** February 6, 2026  
+**Last Updated:** February 7, 2026  
 **Base URL:** `http://localhost:3001`
 
 ---
@@ -406,13 +406,14 @@ Authorization: Bearer <token>
 **Response (201):**
 ```json
 {
-  "success": true,
-  "message": "Institute registered. Awaiting admin approval.",
+  "message": "Institute registered successfully. Awaiting admin approval.",
   "token": "eyJhbGc...",
   "institute": {
     "institute_id": "UNI456",
     "institute_name": "Tech University",
-    "email": "admin@techuni.edu"
+    "email": "admin@techuni.edu",
+    "logo_url": "/uploads/institutes/logos/logo-123.png",
+    "verification_doc_url": "/uploads/institutes/documents/doc-123.pdf"
   }
 }
 ```
@@ -432,11 +433,12 @@ Authorization: Bearer <token>
 **Response (200):**
 ```json
 {
-  "success": true,
+  "message": "Login successful",
   "token": "eyJhbGc...",
   "institute": {
     "institute_id": "UNI456",
-    "institute_name": "Tech University"
+    "institute_name": "Tech University",
+    "email": "admin@techuni.edu"
   }
 }
 ```
@@ -457,6 +459,7 @@ Authorization: Bearer <token>
     "wallet_address": "0x742d...",
     "verification_status": "approved",
     "logo_url": "/uploads/...",
+    "verification_doc_url": "/uploads/...",
     "created_at": "2026-01-01T00:00:00Z"
   }
 }
@@ -486,7 +489,31 @@ Authorization: Bearer <token>
 
 ---
 
-### 5. Issue Certificate
+### 5. Search Students (Autocomplete)
+**GET** `/api/university/students/search?query=...&limit=10`  
+**Auth:** Required
+
+**Notes:**
+- `query` must be at least 3 characters
+- `limit` defaults to 10 (max 25)
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "students": [
+    {
+      "user_id": "STU123456789",
+      "full_name": "John Doe",
+      "email": "john@example.com"
+    }
+  ]
+}
+```
+
+---
+
+### 6. Issue Certificate
 **POST** `/api/university/certificate/issue`  
 **Auth:** Required
 
@@ -498,23 +525,29 @@ Authorization: Bearer <token>
 }
 ```
 
-**Response (200):**
+**Response (201):**
 ```json
 {
-  "success": true,
-  "message": "Certificate issued successfully",
+  "message": "Certificate issued successfully on blockchain!",
   "certificate": {
     "certificate_id": "CERT123",
     "student_id": "STU123456789",
     "course_name": "Blockchain Fundamentals",
-    "blockchain_tx_hash": "0x123..."
+    "grade": "A",
+    "issued_date": "2026-01-01",
+    "blockchain": {
+      "transactionHash": "0x123...",
+      "blockNumber": 12345,
+      "gasUsed": "50000"
+    },
+    "status": "Confirmed on Polygon Amoy"
   }
 }
 ```
 
 ---
 
-### 6. Bulk Issue Certificates
+### 7. Bulk Issue Certificates
 **POST** `/api/university/certificates/bulk`  
 **Auth:** Required
 
@@ -538,14 +571,18 @@ Authorization: Bearer <token>
 **Response (200):**
 ```json
 {
-  "success": true,
-  "successCount": 2,
-  "failureCount": 0,
+  "message": "Bulk upload processed",
+  "total": 2,
+  "successful": 2,
+  "failed": 0,
   "results": [
     {
-      "student_id": "STU111",
+      "index": 0,
       "certificate_id": "CERT123",
-      "success": true
+      "student_id": "STU111",
+      "course_name": "Course A",
+      "grade": "A",
+      "status": "Success"
     }
   ]
 }
@@ -553,7 +590,7 @@ Authorization: Bearer <token>
 
 ---
 
-### 7. Get University Certificates
+### 8. Get University Certificates
 **GET** `/api/university/certificates`  
 **Auth:** Required
 
@@ -567,7 +604,7 @@ Authorization: Bearer <token>
 
 ---
 
-### 8. Get Certificate Signature Payload ⭐ Blockchain
+### 9. Get Certificate Signature Payload ⭐ Blockchain
 **POST** `/api/university/certificate/sign-payload`  
 **Auth:** Required
 
@@ -576,8 +613,7 @@ Authorization: Bearer <token>
 {
   "student_id": "STU123456789",
   "course_name": "Blockchain Fundamentals",
-  "grade": "A",
-  "issued_date": "2026-01-01"
+  "grade": "A"
 }
 ```
 
@@ -585,69 +621,71 @@ Authorization: Bearer <token>
 ```json
 {
   "success": true,
+  "certificate_id": "CERT123",
+  "issued_date": "2026-01-01",
+  "signer_address": "0x742d...",
   "message_hash": "0x...",
-  "cert_id": "CERT123",
-  "message_to_sign": "Certificate data for signing"
-}
-```
-
----
-
-### 9. Issue Certificate with Signature ⭐ Blockchain
-**POST** `/api/university/certificate/issue-signed`  
-**Auth:** Required
-
-**Request:**
-```json
-{
-  "certId": "CERT123",
-  "studentName": "John Doe",
-  "courseName": "Blockchain Fundamentals",
-  "issueDate": "2026-01-01",
-  "issuerName": "Tech University",
-  "messageHash": "0x...",
-  "signature": "0x...",
-  "signerAddress": "0x742d..."
-}
-```
-
-**Response (200):**
-```json
-{
-  "success": true,
-  "message": "Certificate issued on blockchain with signature",
-  "certificate": {
-    "certificate_id": "CERT123",
-    "blockchain_tx_hash": "0x...",
-    "blockNumber": 12345,
-    "gasUsed": "50000"
+  "certData": {
+    "certId": "CERT123",
+    "studentName": "John Doe",
+    "courseName": "Blockchain Fundamentals",
+    "issueDate": "2026-01-01",
+    "issuerName": "Tech University"
   }
 }
 ```
 
 ---
 
-### 10. Get Bulk Authorization Message ⭐ Blockchain
+### 10. Issue Certificate with Signature ⭐ Blockchain
+**POST** `/api/university/certificate/issue-signed`  
+**Auth:** Required
+
+**Request:**
+```json
+{
+  "certificate_id": "CERT123",
+  "student_id": "STU123456789",
+  "course_name": "Blockchain Fundamentals",
+  "grade": "A",
+  "issued_date": "2026-01-01",
+  "signature": "0x...",
+  "signer_address": "0x742d...",
+  "message_hash": "0x..."
+}
+```
+
+**Response (201):**
+```json
+{
+  "message": "Certificate issued successfully (MetaMask-signed, relayer-submitted)",
+  "certificate": {
+    "certificate_id": "CERT123",
+    "student_id": "STU123456789",
+    "course_name": "Blockchain Fundamentals",
+    "grade": "A",
+    "issued_date": "2026-01-01",
+    "blockchain": {
+      "transactionHash": "0x...",
+      "blockNumber": 12345,
+      "gasUsed": "50000",
+      "status": 1
+    },
+    "status": "Confirmed on Polygon Amoy"
+  }
+}
+```
+
+---
+
+### 11. Get Bulk Authorization Message ⭐ Blockchain
 **POST** `/api/university/certificate/bulk-auth`  
 **Auth:** Required
 
 **Request:**
 ```json
 {
-  "certificates": [
-    {
-      "student_id": "STU111",
-      "course_name": "Course A",
-      "grade": "A",
-      "issued_date": "2026-01-01"
-    },
-    {
-      "student_id": "STU222",
-      "course_name": "Course B",
-      "grade": "B",
-      "issued_date": "2026-01-01"
-    }
-  ]
+  "certificate_count": 2
 }
 ```
 
@@ -655,38 +693,46 @@ Authorization: Bearer <token>
 ```json
 {
   "success": true,
-  "message_hash": "0x...",
-  "certCount": 2,
-  "message_to_sign": "Bulk certificate authorization message"
+  "auth_hash": "0x...",
+  "batch_id": 1700000000000,
+  "certificate_count": 2,
+  "expiry": 1700003600
 }
 ```
 
 ---
 
-### 11. Bulk Issue with Single Signature ⭐ Blockchain
+### 12. Bulk Issue with Single Signature ⭐ Blockchain
 **POST** `/api/university/certificate/bulk-issue-signed`  
 **Auth:** Required
 
 **Request:**
 ```json
 {
-  "messageHash": "0x...",
-  "signature": "0x...",
-  "signerAddress": "0x742d...",
+  "auth_hash": "0x...",
+  "auth_signature": "0x...",
+  "signer_address": "0x742d...",
+  "batch_id": 1700000000000,
+  "certificate_count": 2,
+  "expiry": 1700003600,
   "certificates": [
     {
       "certId": "CERT123",
+      "student_id": "STU111",
       "studentName": "John Doe",
       "courseName": "Course A",
       "issueDate": "2026-01-01",
-      "issuerName": "Tech University"
+      "issuerName": "Tech University",
+      "grade": "A"
     },
     {
       "certId": "CERT124",
+      "student_id": "STU222",
       "studentName": "Jane Smith",
       "courseName": "Course B",
       "issueDate": "2026-01-01",
-      "issuerName": "Tech University"
+      "issuerName": "Tech University",
+      "grade": "B"
     }
   ]
 }
@@ -696,18 +742,26 @@ Authorization: Bearer <token>
 ```json
 {
   "success": true,
-  "successCount": 2,
-  "failureCount": 0,
-  "message": "Bulk certificates issued on blockchain",
+  "total": 2,
+  "successful": 2,
+  "failed": 0,
   "results": [
     {
-      "certId": "CERT123",
-      "txHash": "0x...",
+      "certificate_id": "CERT123",
+      "student_id": "STU111",
+      "blockchain_tx_hash": "0x...",
+      "blockchain_status": "confirmed",
+      "blockchain_block": 12345,
+      "blockchain_gas_used": "50000",
       "success": true
     },
     {
-      "certId": "CERT124",
-      "txHash": "0x...",
+      "certificate_id": "CERT124",
+      "student_id": "STU222",
+      "blockchain_tx_hash": "0x...",
+      "blockchain_status": "confirmed",
+      "blockchain_block": 12346,
+      "blockchain_gas_used": "48000",
       "success": true
     }
   ]

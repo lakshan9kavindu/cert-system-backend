@@ -19,6 +19,7 @@ router.post('/login', universityController.loginInstitute);
 // Protected routes (require university authentication)
 router.get('/profile', verifyToken, verifyUniversity, universityController.getProfile);
 router.get('/dashboard', verifyToken, verifyUniversity, universityController.getDashboard);
+router.get('/students/search', verifyToken, verifyUniversity, universityController.searchStudents);
 
 // Certificate routes
 router.post('/certificate/issue', verifyToken, verifyUniversity, universityController.issueCertificate);

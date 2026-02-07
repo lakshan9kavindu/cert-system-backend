@@ -194,6 +194,37 @@ exports.getDashboard = async (req, res) => {
   }
 };
 
+// Search students for autocomplete
+exports.searchStudents = async (req, res) => {
+  try {
+    const rawQuery = (req.query.query || '').trim();
+    const limit = Math.min(parseInt(req.query.limit, 10) || 10, 25);
+
+    if (rawQuery.length < 3) {
+      return res.json({ success: true, students: [] });
+    }
+
+    const like = `%${rawQuery}%`;
+    const searchQuery = `
+      SELECT user_id, full_name, email
+      FROM students
+      WHERE user_id LIKE ? OR full_name LIKE ? OR email LIKE ?
+      ORDER BY full_name ASC
+      LIMIT ?
+    `;
+
+    const [rows] = await db.execute(searchQuery, [like, like, like, limit]);
+
+    res.json({
+      success: true,
+      students: rows
+    });
+  } catch (error) {
+    console.error('Student search error:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
 // Issue single certificate
 exports.issueCertificate = async (req, res) => {
   try {
