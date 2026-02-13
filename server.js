@@ -10,7 +10,38 @@ const app = express();
 // =========================================
 // MIDDLEWARE
 // =========================================
-app.use(cors());
+const envFrontendOrigin = (process.env.FRONTEND_URL || '').trim();
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:3000',
+  ...(envFrontendOrigin ? [envFrontendOrigin] : [])
+];
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Allow non-browser clients (curl, Postman, server-to-server)
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    // In development, allow all
+    if (process.env.NODE_ENV !== 'production' || allowedOrigins.length === 0) {
+      return callback(null, true);
+    }
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error('Not allowed by CORS'));
+  },
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
