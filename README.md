@@ -9,16 +9,17 @@ Base URL: `http://localhost:3001`
 1. [Overview](#overview)
 2. [Core Features](#core-features)
 3. [Tech Stack](#tech-stack)
-4. [Prerequisites](#prerequisites)
-5. [Setup Instructions](#setup-instructions)
-6. [Environment Configuration](#environment-configuration)
-7. [Running the Server](#running-the-server)
-8. [Authentication](#authentication)
-9. [API Reference](#api-reference)
-10. [Static Files and Uploads](#static-files-and-uploads)
-11. [Project Structure](#project-structure)
-12. [Team](#team)
-13. [Troubleshooting](#troubleshooting)
+4. [Smart Contract](#smart-contract)
+5. [Prerequisites](#prerequisites)
+6. [Setup Instructions](#setup-instructions)
+7. [Environment Configuration](#environment-configuration)
+8. [Running the Server](#running-the-server)
+9. [Authentication](#authentication)
+10. [API Reference](#api-reference)
+11. [Static Files and Uploads](#static-files-and-uploads)
+12. [Project Structure](#project-structure)
+13. [Team](#team)
+14. [Troubleshooting](#troubleshooting)
 
 ## Overview
 This backend powers a blockchain-based certificate platform with:
@@ -60,6 +61,12 @@ This backend powers a blockchain-based certificate platform with:
 - Polygon Amoy RPC integration
 - Smart contract interaction via relayer key
 
+### Smart Contract
+- Solidity (`contracts/CertificateVerificationNoNonce.sol`)
+- OpenZeppelin contracts (`@openzeppelin/contracts ^5.4.0`)
+- Signature-based certificate authorization (single and bulk)
+- Prepaid gas-balance model for issuer transactions
+
 ### AI and Messaging
 - Google Generative AI SDK (`@google/generative-ai ^0.24.1`)
 - Nodemailer (`nodemailer ^6.10.1`)
@@ -68,6 +75,23 @@ This backend powers a blockchain-based certificate platform with:
 - Multer (`multer ^2.0.2`)
 - PDFKit (`pdfkit ^0.15.0`)
 - PapaParse (`papaparse ^5.5.3`)
+
+## Smart Contract
+Contract docs:
+- Main contract guide: [`contracts/README.md`](contracts/README.md)
+- Contract source: [`contracts/CertificateVerificationNoNonce.sol`](contracts/CertificateVerificationNoNonce.sol)
+
+What the contract handles:
+- On-chain certificate issue/verify
+- Issuer and relayer authorization model
+- Signature verification (per-certificate and bulk auth)
+- Prepaid gas reimbursement workflow
+
+Backend integration requirements:
+1. Deploy the contract on your target network (Polygon Amoy recommended).
+2. Set `CONTRACT_ADDRESS` in `.env`.
+3. Set `RPC_URL` and `RELAYER_PRIVATE_KEY` in `.env`.
+4. Use admin/owner flows to authorize issuers and relayers.
 
 ## Prerequisites
 - Node.js 18+ (Node 20+ recommended)
